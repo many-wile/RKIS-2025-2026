@@ -41,7 +41,9 @@ namespace grib
                         Console.WriteLine(todos[4]);
                         break;
 
-
+                    case "profile": 
+                        Console.WriteLine(fullName);
+                        break;
                 } 
             }
 }
