@@ -1,4 +1,7 @@
-﻿using System.Globalization;
+﻿using System.ComponentModel;
+using System.ComponentModel.Design;
+using System.Globalization;
+using System.Runtime;
 namespace grib
 {
     internal class Program
@@ -18,7 +21,10 @@ namespace grib
         static void second(string[] args)
         {
             string[] todos;
-
+            while (true)
+            {
+                if (ShouldStop( help , profile , add , view , exit , )) break;
+            }
         }
     }
  } 
