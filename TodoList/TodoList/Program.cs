@@ -26,10 +26,10 @@ namespace grib
             while (true)
             {
                 var input = Console.ReadLine();
-                if (input == null)
+                if (input != null)
                 {
                     Console.Write("что вы наделали");
-                    continue;
+                    break;
                 }
 
              switch(input)
@@ -41,9 +41,11 @@ namespace grib
                         Console.WriteLine(todos[4]);
                         break;
 
-                    case "profile": 
-                        Console.WriteLine(fullName);
+                    case "profile":
+                        Console.WriteLine(fullName + age);
                         break;
+
+
                 } 
             }
 }
