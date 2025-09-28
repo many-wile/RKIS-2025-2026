@@ -20,11 +20,15 @@ namespace grib
 
         static void second(string[] args)
         {
-            string[] todos;
+            string[] todos = { "help", "profile", "add", "view", "exit" };
             while (true)
             {
-                if (ShouldStop( help , profile , add , view , exit , )) break;
+                string comand = Console.ReadLine();
+                if (comand == "exit") break;
+                
             }
+
+            
         }
     }
  } 
