@@ -14,6 +14,12 @@ namespace grib
             int age = currentDate.Year - birthDate.Year;
             Console.WriteLine("Добавлен пользователь " + fullName + ", " + "возраст - " + age + " лет");
         }
+
+        static void second(string[] args)
+        {
+            string[] todos;
+
+        }
     }
  } 
 
