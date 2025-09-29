@@ -26,13 +26,13 @@ namespace grib
             while (true)
             {
                 var input = Console.ReadLine();
-                if (input != null)
+                if (input == null)
                 {
                     Console.Write("что вы наделали");
                     break;
                 }
 
-             switch(input)
+                switch (input)
                 {
                     case "help":
                         Console.WriteLine(todos[1]);
@@ -42,29 +42,13 @@ namespace grib
                         break;
 
                     case "profile":
-                        Console.WriteLine(fullName + age);
+                        Console.Write(fullName + age);
                         break;
-
-
-                } 
+                }
             }
-}
-
-        static void second(string[] args)
-        {
-            string[] todos = { "help", "profile", "add", "view", "exit" };
-            todos[1] = "выводит данные пользователя";
-            todos[2] = "добавляет новую задачу";
-            todos[3] = "выводит все задачи из массива";
-            todos[4] = "завершает цикл и останавливает выполнение программы.";
-            Console.Write("Введите команду");
-            while (true)
-            {
-                var input = Console.ReadLine();
-                if (input == "help") ; 
-            }
-
         }
     }
- } 
+
+}
+
 
