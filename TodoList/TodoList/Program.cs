@@ -22,7 +22,7 @@ namespace grib
             todos[2] = "add - добавляет новую задачу";
             todos[3] = "view - выводит все задачи из массива";
             todos[4] = "exit - завершает цикл и останавливает выполнение программы.";
-            Console.Write("Введите команду: ");
+            Console.WriteLine("Введите команду: ");
             while (true)
             {
                 var input = Console.ReadLine();
@@ -42,8 +42,13 @@ namespace grib
                         break;
 
                     case "profile":
-                        Console.Write(fullName + age);
+                        Console.WriteLine(fullName + age);
                         break;
+
+                    case "add":
+                        string task = Console.ReadLine();
+                        break;
+
                 }
             }
         }
