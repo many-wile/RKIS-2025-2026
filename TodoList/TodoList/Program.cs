@@ -38,26 +38,20 @@ namespace grib
                         Console.WriteLine(fullName + " " + "Возраст: " + age);
                         break;
 
-                    case "add":
-                        Console.WriteLine("введите команду");
-                        string task = Console.ReadLine();
-                        string[] parts = task.Split(' ', 2);
-                        if (parts.Length < 2)
+                    case string s when s.StartsWith("add "):
+                        string taskText = s.Substring(4);
+                        if (todosCount >= todos.Length)
                         {
-                            Console.WriteLine("Ошибка: используйте формат add текст задачи");
-                        }
-                        else
-                        {
-                            if (todosCount >= todos.Length) ;
-                            {
                             string[] newTodos = new string[todos.Length * 2];
-                            for (int i = 0; i < task.Length; i++);
+                            for (int i = 0; i < todos.Length; i++)
+                                newTodos[i] = todos[i];
                             todos = newTodos;
-                            }
-                            todos[todosCount++] = parts[1];
-                            Console.WriteLine("Задача добавлена: " + parts[1]);
                         }
+
+                        todos[todosCount++] = taskText;
+                        Console.WriteLine("Задача добавлена: " + taskText);
                         break;
+
 
 
                     case "view":
