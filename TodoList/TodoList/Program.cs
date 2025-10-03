@@ -19,30 +19,19 @@ namespace grib
             DateTime currentDate = DateTime.Today;
             int age = currentDate.Year - birthDate.Year;
             Console.WriteLine("Добавлен пользователь " + fullName + ", " + "возраст - " + age + " лет");
-            string[] tasks = new string[2];
-            int taskCount = 0;
-            string[] todos = { "help", "profile", "add", "view", "exit" };
-            todos[1] = "profile - выводит данные пользователя";
-            todos[2] = "add - добавляет новую задачу";
-            todos[3] = "view - выводит все задачи из массива";
-            todos[4] = "exit - завершает цикл и останавливает выполнение программы.";
+            string[] todos = new string[2];
+            int todosCount = 0;
             Console.WriteLine("Введите команду: ");
             while (true)
             {
                 var input = Console.ReadLine();
-                if (input == null)
-                {
-                    Console.Write("что вы наделали");
-                    break;
-                }
-
                 switch (input)
                 {
                     case "help":
-                        Console.WriteLine(todos[1]);
-                        Console.WriteLine(todos[2]);
-                        Console.WriteLine(todos[3]);
-                        Console.WriteLine(todos[4]);
+                        Console.WriteLine("profile - выводит данные пользователя");
+                        Console.WriteLine("add - добавляет новую задачу");
+                        Console.WriteLine("view - выводит все задачи из массива");
+                        Console.WriteLine("exit - завершает цикл и останавливает выполнение программы.");
                         break;
 
                     case "profile":
@@ -59,13 +48,13 @@ namespace grib
                         }
                         else
                         {
-                            if (taskCount >=task.Length );
+                            if (todosCount >= todos.Length) ;
                             {
-                                string[] newTask = new string[tasks.Length * 2];
-                                for (int i = 0; i < task.Length; i++);
-                                tasks = newTask;
+                            string[] newTodos = new string[todos.Length * 2];
+                            for (int i = 0; i < task.Length; i++);
+                            todos = newTodos;
                             }
-                            tasks[taskCount++] = parts[1];
+                            todos[todosCount++] = parts[1];
                             Console.WriteLine("Задача добавлена: " + parts[1]);
                         }
                         break;
@@ -73,11 +62,11 @@ namespace grib
 
                     case "view":
                         Console.WriteLine("Ваши задачи:");
-                        for (int i = 0; i < taskCount; i++)
+                        for (int i = 0; i < todosCount; i++)
                         {
-                            Console.WriteLine($"{i + 1}. {tasks[i]}");
+                            Console.WriteLine($"{i + 1}. {todos[i]}");
                         }
-                        if (taskCount == 0) Console.WriteLine("Нет задач.");
+                        if (todosCount == 0) Console.WriteLine("Нет задач.");
                         break;
                          
                     case "exit":
