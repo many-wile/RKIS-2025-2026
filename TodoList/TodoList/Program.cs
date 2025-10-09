@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using Microsoft.VisualBasic.FileIO;
+using System.ComponentModel;
 using System.ComponentModel.Design;
 using System.Data.SqlTypes;
 using System.Globalization;
@@ -54,13 +55,64 @@ namespace TodoList
                         {
                             AddTask(input.Substring(4));
                         }
-                        else
-                        { 
-                        Console.WriteLine("Неизвестная команда. Введите 'help' для списка доступных команд.");
+                        else if (input.StartsWith("done "))
+                        {
+                            CompleteTask(input.Substring(5));
                         }
-                            break;
+                        else if (input.StartsWith("delete "))
+                        {
+                            DeleteTask(input.Substring(7));
+                        }
+                        else
+                        {
+                            Console.WriteLine("Неизвестная команда. Введите 'help' для списка доступных команд.");
+                        }
+                        break;
                 }
             }
+        }
+        static void CompleteTask(string indexStr)
+        {
+            if (!int.TryParse(indexStr, out int index))
+            {
+                Console.WriteLine("Неверный номер задачи.");
+                return;
+            }
+
+            if (index < 1 || index > todosCount)
+            {
+                Console.WriteLine("Задачи с таким номером нет.");
+                return;
+            }
+
+            int i = index - 1;
+            statuses[i] = true;
+            dates[i] = DateTime.Now;
+            Console.WriteLine($"Задача {index} выполнена.");
+        }
+        static void DeleteTask(string indexStr)
+        {
+            if (!int.TryParse(indexStr, out int index))
+            {
+                Console.WriteLine("Неверный номер задачи.");
+                return;
+            }
+
+            if (index < 1 || index > todosCount)
+            {
+                Console.WriteLine("Задачи с таким номером нет");
+                return;        
+            }
+
+            int i = index - 1;
+            for (int j = i; j < todosCount - 1; j++)
+            {
+                todos[j] = todos[j + 1];
+                statuses[j] = statuses[j + 1];
+                dates[j] = dates[j + 1];
+            }
+            todosCount--;
+            Console.WriteLine($"Задача {index} удалена.");
         }
         static void ShowHelp()
         {
@@ -109,7 +161,7 @@ namespace TodoList
                 Console.WriteLine("Ваши задачи:");
                 if (todosCount == 0)
                 {
-                    Console.WriteLine("Нет задач.");
+                Console.WriteLine("Нет задач.");
                     return;
                 }
             
