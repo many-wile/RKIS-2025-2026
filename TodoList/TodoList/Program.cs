@@ -81,7 +81,7 @@ namespace TodoList
             }
             todos[todosCount] = taskText;
             statuses[todosCount] = false;
-            dates[todosCount] = DateTime.Now;
+            dates[todosCount] = DateTime.Now:
             todosCount++;
 
             Console.WriteLine($"Задача добавлена: {taskText}");
