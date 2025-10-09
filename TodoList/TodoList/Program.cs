@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel;
 using System.ComponentModel.Design;
+using System.Data.SqlTypes;
 using System.Globalization;
 using System.Reflection.Metadata.Ecma335;
 using System.Runtime;
@@ -11,6 +12,7 @@ namespace TodoList
         static string fullName;
         static int age;
         static string[] todos = new string[2];
+        static bool[] statuses = new bool[2];
         static int todosCount = 0;
 
         static void Main(string[] args)
@@ -24,8 +26,6 @@ namespace TodoList
             DateTime currentDate = DateTime.Today;
             age = currentDate.Year - birthDate.Year;
             Console.WriteLine("Добавлен пользователь " + fullName + ", " + "возраст - " + age + " лет");
-            string[] todos = new string[2];
-            int todosCount = 0;
             Console.WriteLine("Введите команду: ");
             while (true)
             {
@@ -74,24 +74,30 @@ namespace TodoList
         }
         static void AddTask(string taskText)
         {
-            if (todosCount >= todos.Length) ;
+            if (todosCount >= todos.Length)
             {
                 ExpandArray();
             }
+            todos[todosCount] = taskText;
+            statuses[todosCount] = false;
             todos[todosCount++] = taskText;
             Console.WriteLine($"Задача добавлена: {taskText}");
 
         }
-            static void ExpandArray()
+        static void ExpandArray()
             {
-                string[] newTodos = new string[todos.Length * 2];
+            int newSize = todos.Length * 2;
+                string[] newTodos = new string[newSize];
+            bool[] newStatuses = new bool[newSize];
                 for (int i = 0; i < todos.Length; i++)
                 {
                     newTodos[i] = todos[i];
+                    newStatuses[i] = statuses[i];
                 }
                 todos = newTodos;
+            statuses = newStatuses;
             }
-            static void ViewTasks()
+        static void ViewTasks()
             {
                 Console.WriteLine("Ваши задачи:");
                 if (todosCount == 0)
@@ -105,7 +111,7 @@ namespace TodoList
                     Console.WriteLine($"{i + 1}. {todos[i]}");
                 }
             }
-            static void ExitProgram()
+        static void ExitProgram()
             {
                 Console.WriteLine("Завершение программы...");
                 Environment.Exit(0);
