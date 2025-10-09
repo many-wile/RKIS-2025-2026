@@ -45,8 +45,8 @@ namespace TodoList
                         break;
 
                     case "exit":
-                        Console.WriteLine("Завершение задачи");
-                        return;
+                        ExitProgram();
+                        break;
 
                     default:
                         if (input.StartsWith("add "))
