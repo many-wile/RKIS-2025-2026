@@ -80,6 +80,7 @@ namespace TodoList
                 ExpandArray();
             }
             todos[todosCount] = taskText;
+            statuses[todosCount] = false;
             dates[todosCount] = DateTime.Now;
             todosCount++;
 
@@ -114,7 +115,7 @@ namespace TodoList
 
                 for (int i = 0; i < todosCount; i++)
                 {
-                    Console.WriteLine($"{i + 1}. {todos[i]})");
+                    Console.WriteLine($"{i + 1}. {todos[i]}, (дата: {dates[i]})");
                 }
             }
         static void ExitProgram()
