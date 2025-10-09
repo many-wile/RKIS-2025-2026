@@ -63,6 +63,10 @@ namespace TodoList
                         {
                             DeleteTask(input.Substring(7));
                         }
+                        else if (input.StartsWith("update "))
+                        {
+                            UpdateTask(input.Substring(7));
+                        }
                         else
                         {
                             Console.WriteLine("Неизвестная команда. Введите 'help' для списка доступных команд.");
@@ -113,6 +117,41 @@ namespace TodoList
             }
             todosCount--;
             Console.WriteLine($"Задача {index} удалена.");
+        }
+        static void UpdateTask(string input)
+        {
+            int firstSpace = input.IndexOf(' ');
+            if (firstSpace == -1)
+            {
+                Console.WriteLine("Неверный формат команды. Используйте: update <номер> \"новый текст\"");
+                return;
+            }
+
+            string indexStr = input.Substring(0, firstSpace);
+            string newText = input.Substring(firstSpace + 1).Trim();
+
+            if (newText.StartsWith("\"") && newText.EndsWith("\""))
+            {
+                newText = newText[1..^1];
+            }
+
+            if (!int.TryParse(indexStr, out int index))
+            {
+                Console.WriteLine("Неверный номер задачи.");
+                return;
+            }
+
+            if (index < 1 || index > todosCount)
+            {
+                Console.WriteLine("Задачи с таким номером нет.");
+                return;
+            }
+
+            int i = index - 1;
+            todos[i] = newText;
+            dates[i] = DateTime.Now;
+
+            Console.WriteLine($"Задача {index} обновлена: {newText}");
         }
         static void ShowHelp()
         {
