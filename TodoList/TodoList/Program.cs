@@ -112,10 +112,12 @@ namespace TodoList
                     Console.WriteLine("Нет задач.");
                     return;
                 }
+            
 
                 for (int i = 0; i < todosCount; i++)
                 {
-                    Console.WriteLine($"{i + 1}. {todos[i]}, (дата: {dates[i]})");
+                string status = statuses[i] ? "сделано" : "не сделано";
+                    Console.WriteLine($"{i + 1}. {status}  {todos[i]}, (дата: {dates[i]})");
                 }
             }
         static void ExitProgram()
