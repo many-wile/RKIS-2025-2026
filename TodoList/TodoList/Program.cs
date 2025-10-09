@@ -8,16 +8,21 @@ namespace TodoList
 {
     internal class Program
     {
+        static string fullName;
+        static int age;
+        static string[] todos = new string[2];
+        static int todosCount = 0;
+
         static void Main(string[] args)
 
         {
             Console.WriteLine("Работу выполнили Нестеренко и Горелов");
             Console.WriteLine("будьте любезны ввести свои фамилию и имя!");
-            string fullName = Console.ReadLine();
+            fullName = Console.ReadLine();
             Console.WriteLine("Теперь введите дату рождения  в формате ДД.ММ.ГГГГ");
             DateTime birthDate = DateTime.ParseExact(Console.ReadLine(), "dd.MM.yyyy", CultureInfo.InvariantCulture);
             DateTime currentDate = DateTime.Today;
-            int age = currentDate.Year - birthDate.Year;
+            age = currentDate.Year - birthDate.Year;
             Console.WriteLine("Добавлен пользователь " + fullName + ", " + "возраст - " + age + " лет");
             string[] todos = new string[2];
             int todosCount = 0;
@@ -28,51 +33,84 @@ namespace TodoList
                 switch (input)
                 {
                     case "help":
-                        Console.WriteLine("profile - выводит данные пользователя");
-                        Console.WriteLine("add - добавляет новую задачу");
-                        Console.WriteLine("view - выводит все задачи из массива");
-                        Console.WriteLine("exit - завершает цикл и останавливает выполнение программы.");
+                        ShowHelp();
                         break;
 
                     case "profile":
-                        Console.WriteLine(fullName + " " + "Возраст: " + age);
+                        ShowProfile();
                         break;
-
-                    case string s when s.StartsWith("add "):
-                        string taskText = s.Substring(4);
-                        if (todosCount >= todos.Length)
-                        {
-                            string[] newTodos = new string[todos.Length * 2];
-                            for (int i = 0; i < todos.Length; i++)
-                                newTodos[i] = todos[i];
-                            todos = newTodos;
-                        }
-
-                        todos[todosCount++] = taskText;
-                        Console.WriteLine("Задача добавлена: " + taskText);
-                        break;
-
-
 
                     case "view":
-                        Console.WriteLine("Ваши задачи:");
-                        for (int i = 0; i < todosCount; i++)
-                        {
-                            Console.WriteLine($"{i + 1}. {todos[i]}");
-                        }
-                        if (todosCount == 0) Console.WriteLine("Нет задач.");
+                        ViewTasks();
                         break;
-                         
+
                     case "exit":
                         Console.WriteLine("Завершение задачи");
                         return;
 
                     default:
-                        Console.WriteLine("Неизвестная команда");
-                        break;
+                        if (input.StartsWith("add "))
+                        {
+                            AddTask(input.Substring(4));
+                        }
+                        else
+                        { 
+                        Console.WriteLine("Неизвестная команда. Введите 'help' для списка доступных команд.");
+                        }
+                            break;
                 }
             }
         }
+        static void ShowHelp()
+        {
+            Console.WriteLine("profile - выводит данные пользователя");
+            Console.WriteLine("add - добавляет новую задачу");
+            Console.WriteLine("view - выводит все задачи из массива");
+            Console.WriteLine("exit - завершает цикл и останавливает выполнение программы.");
+        }
+        static void ShowProfile()
+        {
+            Console.WriteLine($"{fullName}, возраст: {age} лет");
+        }
+        static void AddTask(string taskText)
+        {
+            if (todosCount >= todos.Length) ;
+            {
+                ExpandArray();
+            }
+            todos[todosCount++] = taskText;
+            Console.WriteLine($"Задача добавлена: {taskText}");
+
+        }
+            static void ExpandArray()
+            {
+                string[] newTodos = new string[todos.Length * 2];
+                for (int i = 0; i < todos.Length; i++)
+                {
+                    newTodos[i] = todos[i];
+                }
+                todos = newTodos;
+            }
+            static void ViewTasks()
+            {
+                Console.WriteLine("Ваши задачи:");
+                if (todosCount == 0)
+                {
+                    Console.WriteLine("Нет задач.");
+                    return;
+                }
+
+                for (int i = 0; i < todosCount; i++)
+                {
+                    Console.WriteLine($"{i + 1}. {todos[i]}");
+                }
+            }
+            static void ExitProgram()
+            {
+                Console.WriteLine("Завершение программы...");
+                Environment.Exit(0);
+            }
+
     }
 
 }
