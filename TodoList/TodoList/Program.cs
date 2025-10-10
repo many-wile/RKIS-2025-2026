@@ -159,6 +159,9 @@ namespace TodoList
             Console.WriteLine("add - добавляет новую задачу");
             Console.WriteLine("view - выводит все задачи из массива");
             Console.WriteLine("exit - завершает цикл и останавливает выполнение программы.");
+            Console.WriteLine("done - обозначить задачу как выполненую");
+            Console.WriteLine("update - изменить задачу");
+            Console.WriteLine("delete - удалить задачу");
         }
         static void ShowProfile()
         {
