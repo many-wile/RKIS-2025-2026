@@ -1,11 +1,4 @@
-﻿using Microsoft.VisualBasic.FileIO;
-using System.ComponentModel;
-using System.ComponentModel.Design;
-using System.Data.SqlTypes;
-using System.Globalization;
-using System.Reflection.Metadata.Ecma335;
-using System.Runtime;
-using System.Threading.Tasks;
+﻿using System.Globalization;
 namespace TodoList
 {
     internal class Program
@@ -16,7 +9,6 @@ namespace TodoList
         static bool[] statuses = new bool[2];
         static DateTime[] dates = new DateTime[2]; 
         static int todosCount = 0;
-
         static void Main(string[] args)
 
         {
@@ -37,19 +29,15 @@ namespace TodoList
                     case "help":
                         ShowHelp();
                         break;
-
                     case "profile":
                         ShowProfile();
                         break;
-
                     case "view":
                         ViewTasks();
                         break;
-
                     case "exit":
                         ExitProgram();
                         break;
-
                     default:
                         if (input.StartsWith("add "))
                         {
@@ -82,13 +70,11 @@ namespace TodoList
                 Console.WriteLine("Неверный номер задачи.");
                 return;
             }
-
             if (index < 1 || index > todosCount)
             {
                 Console.WriteLine("Задачи с таким номером нет.");
                 return;
             }
-
             int i = index - 1;
             statuses[i] = true;
             dates[i] = DateTime.Now;
@@ -101,13 +87,11 @@ namespace TodoList
                 Console.WriteLine("Неверный номер задачи.");
                 return;
             }
-
             if (index < 1 || index > todosCount)
             {
                 Console.WriteLine("Задачи с таким номером нет");
                 return;        
             }
-
             int i = index - 1;
             for (int j = i; j < todosCount - 1; j++)
             {
@@ -126,27 +110,23 @@ namespace TodoList
                 Console.WriteLine("Неверный формат команды. Используйте: update <номер> \"новый текст\"");
                 return;
             }
-
             string indexStr = input.Substring(0, firstSpace);
             string newText = input.Substring(firstSpace + 1).Trim();
 
             if (newText.StartsWith("\"") && newText.EndsWith("\""))
             {
-                newText = newText[1..^1];
+               newText = newText[1..^1];
             }
-
             if (!int.TryParse(indexStr, out int index))
             {
                 Console.WriteLine("Неверный номер задачи.");
                 return;
             }
-
             if (index < 1 || index > todosCount)
             {
                 Console.WriteLine("Задачи с таким номером нет.");
                 return;
             }
-
             int i = index - 1;
             todos[i] = newText;
             dates[i] = DateTime.Now;
@@ -179,7 +159,6 @@ namespace TodoList
             todosCount++;
 
             Console.WriteLine($"Задача добавлена: {taskText}");
-
         }
         static void ExpandArray()
             {
@@ -187,7 +166,6 @@ namespace TodoList
                 string[] newTodos = new string[newSize];
             bool[] newStatuses = new bool[newSize];
             DateTime[] newDates = new DateTime[newSize];
-
             for (int i = 0; i < todos.Length; i++)
                 {
                     newTodos[i] = todos[i];
@@ -206,8 +184,6 @@ namespace TodoList
                 Console.WriteLine("Нет задач.");
                     return;
                 }
-            
-
                 for (int i = 0; i < todosCount; i++)
                 {
                 string status = statuses[i] ? "сделано" : "не сделано";
