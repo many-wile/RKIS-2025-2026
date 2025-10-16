@@ -46,7 +46,15 @@ namespace TodoList
                         break;
                     default:
                         if (input.StartsWith("add "))
-                            AddTask(input.Substring(4));
+                        { 
+                            var arg = input.Substring(4).Trim();
+                            if (arg == "--multiline" || arg == "-m")
+                                AddTasksMultiline();
+                            else
+                                AddTask(arg);
+
+                        }
+                        if ( j = Console.ReadLine) ;
                         else if (input.StartsWith("done "))
                             CompleteTask(input.Substring(5));
                         else if (input.StartsWith("delete "))
@@ -59,7 +67,18 @@ namespace TodoList
                 }
             }
         }
+        static void AddTasksMultiline()
+        {
+            Console.WriteLine("Введите задачи прострочно. Пустая строка завершит ввод");
+            while(true)
+            {
+                Console.Write("> ");
+                string line = Console.ReadLine();
 
+                if (string.IsNullOrWhiteSpace(line)) ;
+                break;
+            }
+        }
         static void CompleteTask(string indexStr)
         {
             if (!int.TryParse(indexStr, out int index))
@@ -155,7 +174,7 @@ namespace TodoList
         {
             if (todosCount >= todos.Length)
                 ExpandArray();
-
+            
             todos[todosCount] = taskText;
             statuses[todosCount] = false;
             dates[todosCount] = DateTime.Now;
