@@ -38,8 +38,9 @@ namespace TodoList
                     case "profile":
                         ShowProfile();
                         break;
-                    case "view":
-                        ViewTasks();
+                    case string s when s.StartsWith("view"):
+                        bool showIndex = s.Contains("--index") || s.Contains("-i");
+                        ViewTasks(showIndex);
                         break;
                     case "exit":
                         ExitProgram();
@@ -215,7 +216,7 @@ namespace TodoList
             dates = newDates;
         }
 
-        static void ViewTasks()
+        static void ViewTasks(bool showIndex = false)
         {
             Console.WriteLine("Ваши задачи:");
             if (todosCount == 0)
@@ -223,11 +224,15 @@ namespace TodoList
                 Console.WriteLine("Нет задач.");
                 return;
             }
-
             for (int i = 0; i < todosCount; i++)
             {
-                string status = statuses[i] ? "сделано" : "не сделано";
-                Console.WriteLine($"{i + 1}. {status} — {todos[i]} (дата: {dates[i]})");
+                if (showIndex)
+                    Console.WriteLine(i + 1);
+                else
+                {
+                    string status = statuses[i] ? "сделано" : "не сделано";
+                    Console.WriteLine($"{i + 1}. {status} — {todos[i]} (дата: {dates[i]})");
+                }
             }
         }
 
