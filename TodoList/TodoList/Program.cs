@@ -19,10 +19,14 @@ namespace TodoList
             fullName = Console.ReadLine();
 
             Console.WriteLine("Теперь введите дату рождения в формате ДД.ММ.ГГГГ");
-            DateTime birthDate = DateTime.ParseExact(Console.ReadLine(), "dd.MM.yyyy", CultureInfo.InvariantCulture);
-            DateTime currentDate = DateTime.Today;
-            age = currentDate.Year - birthDate.Year;
+            string dat = Console.ReadLine();
+            if (!DateTime.TryParseExact(dat, "dd.MM.yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime birthDate))
+            {
+                Console.WriteLine("Неверный формат возраста!");
+                return;
+            }
 
+            age = DateTime.Today.Year - birthDate.Year;
             Console.WriteLine($"Добавлен пользователь {fullName}, возраст - {age} лет");
             Console.WriteLine("Введите команду:");
 
