@@ -123,7 +123,7 @@ namespace TodoList
 
         static void DeleteTask(string indexStr)
         {
-            if (!int.TryParse(indexStr, out int index))
+            if (!int.TryParse(indexStr, out int index)) 
             {
                 Console.WriteLine("Неверный номер задачи.");
                 return;
