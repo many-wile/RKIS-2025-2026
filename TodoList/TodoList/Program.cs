@@ -179,14 +179,27 @@ namespace TodoList
 
         static void ShowHelp()
         {
-            Console.WriteLine("Доступные команды:");
-            Console.WriteLine("profile - выводит данные пользователя");
-            Console.WriteLine("add <текст> - добавляет новую задачу");
-            Console.WriteLine("view - выводит все задачи");
-            Console.WriteLine("done <номер> - отмечает задачу как выполненную");
-            Console.WriteLine("update <номер> \"новый текст\" - изменяет задачу");
-            Console.WriteLine("delete <номер> - удаляет задачу");
-            Console.WriteLine("exit - завершает программу");
+            Console.WriteLine("Доступные команды: ");
+            Console.WriteLine("profile - выводит данные о пользователе");
+            Console.WriteLine("add - добавляет новую задачу");
+            Console.WriteLine("view - выводит все задачи из массива");
+            Console.WriteLine("read <idx> - показывает полную информацию о задаче");
+            Console.WriteLine("done <idx> - отмечает задачу выполненной");
+            Console.WriteLine("delete <idx> - удаляет задачу по индексу");
+            Console.WriteLine("update <idx> \"new_text\" - обновляет текст задачи");
+            Console.WriteLine("exit - завершает цикл и останавливает выполнение программы");
+            Console.WriteLine("Флаги:");
+            Console.WriteLine("  --multiline или -m - многострочный ввод для add");
+            Console.WriteLine("  -i - показывать только невыполненные задачи для view");
+            Console.WriteLine("  -s - показывать статистику для view");
+            Console.WriteLine("Флаги для view:");
+            Console.WriteLine("  --index или -i - показывать индекс задачи");
+            Console.WriteLine("  --status или -s - показывать статус задачи");
+            Console.WriteLine("  --update-date или -d - показывать дату изменения");
+            Console.WriteLine("  --all или -a - показывать все данные");
+            Console.WriteLine("  --incomplete или -I - показывать только невыполненные");
+            Console.WriteLine("  --statistics или -S - показывать статистику");
+            Console.WriteLine("Примеры: view -isd, view --all, view -i --status");
         }
 
         static void ShowProfile()
