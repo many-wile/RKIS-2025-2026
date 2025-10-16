@@ -39,9 +39,14 @@ namespace TodoList
                         ShowProfile();
                         break;
                     case string s when s.StartsWith("view"):
+                        {
                         bool showIndex = s.Contains("--index") || s.Contains("-i");
-                        ViewTasks(showIndex);
+                        bool showStatus = s.Contains("--status") || s.Contains("-s");
+                        bool showDate = s.Contains("--update-date") || s.Contains("-d");
+                        bool showAll = s.Contains("--all") || s.Contains("-a");
+                        ViewTasks(showIndex, showStatus, showDate, showAll);
                         break;
+                        }
                     case "exit":
                         ExitProgram();
                         break;
@@ -216,23 +221,43 @@ namespace TodoList
             dates = newDates;
         }
 
-        static void ViewTasks(bool showIndex = false)
+        static void ViewTasks(bool showIndex = false, bool showStatus = false, bool showDate = false, bool showAll = false)
         {
-            Console.WriteLine("Ваши задачи:");
             if (todosCount == 0)
             {
                 Console.WriteLine("Нет задач.");
                 return;
             }
+
+            int indexWidth = 5;
+            int textWidth = 30;   
+            int statusWidth = 12;
+            int dateWidth = 20;
+            string header = "";
+            if (showIndex || showAll) header += $"{"№".PadRight(indexWidth)} ";
+            header += $"{"Задача".PadRight(textWidth)} ";
+            if (showStatus || showAll) header += $"{"Статус".PadRight(statusWidth)} ";
+            if (showDate || showAll) header += $"{"Дата обновления".PadRight(dateWidth)}";
+            Console.WriteLine(header);
+            Console.WriteLine(new string('-', header.Length));
+
             for (int i = 0; i < todosCount; i++)
             {
-                if (showIndex)
-                    Console.WriteLine(i + 1);
-                else
-                {
-                    string status = statuses[i] ? "сделано" : "не сделано";
-                    Console.WriteLine($"{i + 1}. {status} — {todos[i]} (дата: {dates[i]})");
-                }
+                string line = "";
+                if (showIndex || showAll)
+                    line += $"{(i + 1).ToString().PadRight(indexWidth)} ";
+                string taskText = todos[i];
+                if (taskText.Length > textWidth)
+                    taskText = taskText.Substring(0, textWidth - 3) + "...";
+                line += taskText.PadRight(textWidth) + " ";
+
+                if (showStatus || showAll)
+                    line += (statuses[i] ? "Сделано" : "Не сделано").PadRight(statusWidth) + " ";
+
+                if (showDate || showAll)
+                    line += dates[i].ToString("dd.MM.yyyy HH:mm").PadRight(dateWidth);
+
+                Console.WriteLine(line);
             }
         }
 
@@ -241,6 +266,7 @@ namespace TodoList
             Console.WriteLine("Завершение программы...");
             Environment.Exit(0);
         }
+
     }
 }
 
