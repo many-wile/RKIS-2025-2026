@@ -66,12 +66,17 @@ namespace TodoList
                             DeleteTask(input.Substring(7));
                         else if (input.StartsWith("update "))
                             UpdateTask(input.Substring(7));
+                        else if (input.StartsWith("read "))
+                        {
+                            ReadTask(input.Substring(5).Trim());
+                        }
                         else
                             Console.WriteLine("Неизвестная команда. Введите 'help' для списка доступных команд.");
                         break;
                 }
             }
         }
+
         static void AddTasksMultiline()
         {
             Console.WriteLine("Введите задачи прострочно. Пустая строка завершит ввод");
@@ -259,6 +264,27 @@ namespace TodoList
 
                 Console.WriteLine(line);
             }
+        }
+        static void ReadTask(string indexStr)
+        {
+            if (!int.TryParse(indexStr, out int index))
+            {
+                Console.WriteLine("Неверный номер задачи.");
+                return;
+            }
+
+            if (index < 1 || index > todosCount)
+            {
+                Console.WriteLine("Задачи с таким номером нет.");
+                return;
+            }
+
+            int i = index - 1;
+
+            Console.WriteLine("Полный текст задачи:");
+            Console.WriteLine(todos[i]);
+            Console.WriteLine($"Статус: {(statuses[i] ? "Выполнена" : "Не выполнена")}");
+            Console.WriteLine($"Дата последнего изменения: {dates[i]:dd.MM.yyyy HH:mm}");
         }
 
         static void ExitProgram()
