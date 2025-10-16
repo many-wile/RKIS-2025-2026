@@ -54,7 +54,6 @@ namespace TodoList
                                 AddTask(arg);
 
                         }
-                        if ( j = Console.ReadLine) ;
                         else if (input.StartsWith("done "))
                             CompleteTask(input.Substring(5));
                         else if (input.StartsWith("delete "))
@@ -70,13 +69,27 @@ namespace TodoList
         static void AddTasksMultiline()
         {
             Console.WriteLine("Введите задачи прострочно. Пустая строка завершит ввод");
+            string fullTask = "";
+
             while(true)
             {
                 Console.Write("> ");
                 string line = Console.ReadLine();
-
-                if (string.IsNullOrWhiteSpace(line)) ;
+                if (line == "!end")
                 break;
+
+                if (!string.IsNullOrEmpty(fullTask))
+                    fullTask += "\n";
+                fullTask += line;
+            }
+
+            if (!string.IsNullOrWhiteSpace(fullTask))
+            {
+                AddTask(fullTask);
+            }
+            else
+            {
+                Console.WriteLine("Задача пуста, не добавлена.");
             }
         }
         static void CompleteTask(string indexStr)
