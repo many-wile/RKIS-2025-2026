@@ -44,12 +44,39 @@ namespace TodoList
                         break;
                     case string s when s.StartsWith("view"):
                         {
-                        bool showIndex = s.Contains("--index") || s.Contains("-i");
-                        bool showStatus = s.Contains("--status") || s.Contains("-s");
-                        bool showDate = s.Contains("--update-date") || s.Contains("-d");
-                        bool showAll = s.Contains("--all") || s.Contains("-a");
-                        ViewTasks(showIndex, showStatus, showDate, showAll);
-                        break;
+                            var parts = s.Split(' ');
+                            bool showIndex = false;
+                            bool showStatus = false;
+                            bool showDate = false;
+                            bool showAll = false;
+                            foreach (var part in parts)
+                            {
+                                if (part == "view") continue;
+
+                                if (part.StartsWith("--"))
+                                {
+                                    showIndex |= part == "--index";
+                                    showStatus |= part == "--status";
+                                    showDate |= part == "--update-date";
+                                    showAll |= part == "--all";
+                                }
+                                else if (part.StartsWith('-'))
+                                {
+                                    foreach (char flag in part[1..])
+                                    {
+                                        switch (flag)
+                                        {
+                                            case 'i': showIndex = true; break;
+                                            case 's': showStatus = true; break;
+                                            case 'd': showDate = true; break;
+                                            case 'a': showAll = true; break;
+                                        }
+                                    }
+                                }
+                            }
+
+                            ViewTasks(showIndex, showStatus, showDate, showAll);
+                            break;
                         }
                     case "exit":
                         ExitProgram();
@@ -183,25 +210,33 @@ namespace TodoList
 
         static void ShowHelp()
         {
-            Console.WriteLine("Доступные команды: ");
-            Console.WriteLine("profile - выводит данные о пользователе");
-            Console.WriteLine("add - добавляет новую задачу");
-            Console.WriteLine("view - выводит все задачи из массива");
-            Console.WriteLine("read <idx> - показывает полную информацию о задаче");
-            Console.WriteLine("done <idx> - отмечает задачу выполненной");
-            Console.WriteLine("delete <idx> - удаляет задачу по индексу");
-            Console.WriteLine("update <idx> \"new_text\" - обновляет текст задачи");
-            Console.WriteLine("exit - завершает цикл и останавливает выполнение программы");
-            Console.WriteLine("Флаги для add:");
-            Console.WriteLine("  --multiline или -m - многострочный ввод ");
-            Console.WriteLine("Флаги для view:");
-            Console.WriteLine("  --index или -i - показывать индекс задачи");
-            Console.WriteLine("  --status или -s - показывать статус задачи");
-            Console.WriteLine("  --update-date или -d - показывать дату изменения");
-            Console.WriteLine("  --all или -a - показывать все данные");
-            Console.WriteLine("  --incomplete или -I - показывать только невыполненные");
-            Console.WriteLine("  --statistics или -S - показывать статистику");
-            Console.WriteLine("Примеры: view -isd, view --all, view -i --status");
+        Console.WriteLine(@"
+        Доступные команды:
+          profile - выводит данные о пользователе
+          add - добавляет новую задачу
+          view - выводит все задачи из массива
+          read <idx> - показывает полную информацию о задаче
+          done <idx> - отмечает задачу выполненной
+          delete <idx> - удаляет задачу по индексу
+          update <idx> ""new_text"" - обновляет текст задачи
+          exit - завершает цикл и останавливает выполнение программы
+
+        Флаги для add:
+          --multiline или -m - многострочный ввод
+
+        Флаги для view:
+          --index или -i - показывать индекс задачи
+          --status или -s - показывать статус задачи
+          --update-date или -d - показывать дату изменения
+          --all или -a - показывать все данные
+          --incomplete или -I - показывать только невыполненные
+          --statistics или -S - показывать статистику
+
+        Примеры:
+          view -isd
+          view --all
+          view -i --status
+        ");
         }
 
         static void ShowProfile()
