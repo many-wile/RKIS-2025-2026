@@ -43,41 +43,8 @@ namespace TodoList
                         ShowProfile();
                         break;
                     case string s when s.StartsWith("view"):
-                        {
-                            var parts = s.Split(' ');
-                            bool showIndex = false;
-                            bool showStatus = false;
-                            bool showDate = false;
-                            bool showAll = false;
-                            foreach (var part in parts)
-                            {
-                                if (part == "view") continue;
-
-                                if (part.StartsWith("--"))
-                                {
-                                    showIndex |= part == "--index";
-                                    showStatus |= part == "--status";
-                                    showDate |= part == "--update-date";
-                                    showAll |= part == "--all";
-                                }
-                                else if (part.StartsWith('-'))
-                                {
-                                    foreach (char flag in part[1..])
-                                    {
-                                        switch (flag)
-                                        {
-                                            case 'i': showIndex = true; break;
-                                            case 's': showStatus = true; break;
-                                            case 'd': showDate = true; break;
-                                            case 'a': showAll = true; break;
-                                        }
-                                    }
-                                }
-                            }
-
-                            ViewTasks(showIndex, showStatus, showDate, showAll);
-                            break;
-                        }
+                        ViewTask(s);
+                        break;
                     case "exit":
                         ExitProgram();
                         break;
@@ -106,6 +73,42 @@ namespace TodoList
                         break;
                 }
             }
+        }
+        static void ViewTask(string s)
+        {
+            var parts = s.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+            bool showIndex = false;
+            bool showStatus = false;
+            bool showDate = false;
+            bool showAll = false;
+
+            foreach (var part in parts)
+            {
+                if (part == "view") continue;
+
+                if (part.StartsWith("--"))
+                {
+                    showIndex |= part == "--index";
+                    showStatus |= part == "--status";
+                    showDate |= part == "--update-date";
+                    showAll |= part == "--all";
+                }
+                else if (part.StartsWith('-'))
+                {
+                    foreach (char flag in part[1..])
+                    {
+                        switch (flag)
+                        {
+                            case 'i': showIndex = true; break;
+                            case 's': showStatus = true; break;
+                            case 'd': showDate = true; break;
+                            case 'a': showAll = true; break;
+                        }
+                    }
+                }
+            }
+
+            ViewTasks(showIndex, showStatus, showDate, showAll);
         }
 
         static void AddTasksMultiline()
@@ -301,9 +304,9 @@ namespace TodoList
                 string line = "";
                 if (showIndex || showAll)
                     line += $"{(i + 1).ToString().PadRight(indexWidth)} ";
-                string taskText = todos[i];
+                string taskText = todos[i].Split('\n')[0];
                 if (taskText.Length > textWidth)
-                    taskText = taskText.Substring(0, textWidth - 3) + "...";
+                    taskText = taskText[..(textWidth - 3)] + "...";
                 line += taskText.PadRight(textWidth) + " ";
 
                 if (showStatus || showAll)
