@@ -8,19 +8,17 @@ namespace TodoList
     {
         internal class Profile
         {
-            private string firstName;
-            private string lastName;
-            private int birthYear;
+        private string fullName;
+        private int birthYear;
 
-            public Profile(string firstName, string lastName, int birthYear)
+            public Profile(string fullName, int birthYear)
             {
-                this.firstName = firstName;
-                this.lastName = lastName;
-                this.birthYear = birthYear;
+            this.fullName = fullName;
+            this.birthYear = birthYear;
             }
         public string GetFullName()
         {
-            return firstName + " " + lastName;
+            return fullName;
         }
         public int GetAge()
         {
@@ -29,7 +27,7 @@ namespace TodoList
 
         public string GetInfo()
             {
-            return $"{GetFullName()}, возраст {GetAge()} лет";
+            return $"{fullName}, возраст {GetAge()} лет";
             }
         }
     }

@@ -5,27 +5,22 @@ namespace TodoList
 {
     internal class Program
     {
-        static string fullName;
-        static int age;
-
         static void Main(string[] args)
         {
-            TodoList tasks = new TodoList();
-
             Console.WriteLine("Работу выполнили Нестеренко и Горелов");
-            Console.WriteLine("Введите фамилию и имя:");
-            fullName = Console.ReadLine();
+            Console.WriteLine("Введите полное имя:");
+            string fullName = Console.ReadLine();
 
             Console.WriteLine("Введите дату рождения (ДД.MM.ГГГГ):");
-            string dat = Console.ReadLine();
-            if (!DateTime.TryParseExact(dat, "dd.MM.yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime birthDate))
+            if (!DateTime.TryParseExact(Console.ReadLine(), "dd.MM.yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime birthDate))
             {
-                Console.WriteLine("Неверный формат!");
+                Console.WriteLine("Неверный формат даты!");
                 return;
             }
 
-            age = DateTime.Today.Year - birthDate.Year;
-            Console.WriteLine($"Пользователь {fullName}, возраст: {age} лет");
+            Profile profile = new Profile(fullName, birthDate.Year);
+            Console.WriteLine($"Пользователь: {profile.GetInfo()}");
+            TodoList todoList = new TodoList();
 
             Console.WriteLine("Введите команду (help - список команд):");
 
@@ -33,7 +28,6 @@ namespace TodoList
             {
                 Console.Write("> ");
                 string input = Console.ReadLine();
-
                 if (string.IsNullOrWhiteSpace(input))
                     continue;
 
@@ -42,18 +36,28 @@ namespace TodoList
                 else if (input == "help")
                     ShowHelp();
                 else if (input == "profile")
-                    Console.WriteLine($"{fullName}, возраст: {age} лет");
+                    Console.WriteLine(profile.GetInfo());
                 else if (input.StartsWith("add -m") || input.StartsWith("add --multiline"))
-                    AddMultiline(tasks);
+                    AddMultiline(todoList);
                 else if (input.StartsWith("add "))
-                    tasks.Add(new TodoItem(input.Substring(4).Trim()));
+                {
+                    string taskText = input.Substring(4).Trim();
+                    TodoItem task = new TodoItem(taskText);
+                    todoList.Add(task);
+                    Console.WriteLine("Задача добавлена.");
+                }
                 else if (input.StartsWith("done "))
                 {
                     if (int.TryParse(input.Substring(5), out int idx))
                     {
-                        var item = tasks.GetItem(idx);
-                        if (item != null) item.MarkDone();
-                        else Console.WriteLine("Задачи с таким номером нет.");
+                        TodoItem item = todoList.GetItem(idx);
+                        if (item != null)
+                        {
+                            item.MarkDone();
+                            Console.WriteLine($"Задача {idx} выполнена.");
+                        }
+                        else
+                            Console.WriteLine("Задачи с таким номером нет.");
                     }
                     else
                         Console.WriteLine("Неверный номер задачи.");
@@ -63,29 +67,36 @@ namespace TodoList
                     string[] parts = input.Split(' ', 3);
                     if (parts.Length >= 3 && int.TryParse(parts[1], out int idx))
                     {
-                        var item = tasks.GetItem(idx);
-                        if (item != null) item.UpdateText(parts[2]);
-                        else Console.WriteLine("Задачи с таким номером нет.");
+                        TodoItem item = todoList.GetItem(idx);
+                        if (item != null)
+                        {
+                            item.UpdateText(parts[2]);
+                            Console.WriteLine($"Задача {idx} обновлена.");
+                        }
+                        else
+                            Console.WriteLine("Задачи с таким номером нет.");
                     }
-                    else Console.WriteLine("Используйте: update <номер> <текст>");
+                    else
+                        Console.WriteLine("Используйте: update <номер> \"текст\"");
                 }
                 else if (input.StartsWith("delete "))
                 {
                     if (int.TryParse(input.Substring(7), out int idx))
-                        tasks.Delete(idx);
-                    else Console.WriteLine("Неверный номер задачи.");
+                        todoList.Delete(idx);
+                    else
+                        Console.WriteLine("Неверный номер задачи.");
                 }
                 else if (input.StartsWith("view"))
-                {
-                    ParseAndView(tasks, input);
-                }
+                    ParseAndView(todoList, input);
                 else if (input.StartsWith("read "))
                 {
                     if (int.TryParse(input.Substring(5), out int idx))
                     {
-                        var item = tasks.GetItem(idx);
-                        if (item != null) Console.WriteLine(item.GetFullInfo());
-                        else Console.WriteLine("Задачи с таким номером нет.");
+                        TodoItem item = todoList.GetItem(idx);
+                        if (item != null)
+                            Console.WriteLine(item.GetFullInfo());
+                        else
+                            Console.WriteLine("Задачи с таким номером нет.");
                     }
                     else
                         Console.WriteLine("Неверный номер задачи.");
@@ -100,25 +111,25 @@ namespace TodoList
         static void ShowHelp()
         {
             Console.WriteLine(@"
-Доступные команды:
- add <текст>          - добавить задачу
- add -m / --multiline - многострочный ввод (завершить '!end' или пустой строкой)
- done <номер>         - отметить задачу выполненной
- update <номер> <текст> - обновить текст
- delete <номер>       - удалить задачу
- view [флаги]         - показать задачи (см. флаги)
- read <номер>         - показать полную информацию
- profile              - информация о пользователе
- help                 - показать команды
- exit                 - выйти
+                    Доступные команды:
+                     add <текст>          - добавить задачу
+                     add -m / --multiline - многострочный ввод (завершить '!end' или пустой строкой)
+                     done <номер>         - отметить задачу выполненной
+                     update <номер> <текст> - обновить текст задачи
+                     delete <номер>       - удалить задачу
+                     view [флаги]         - показать задачи (см. флаги)
+                     read <номер>         - показать полное описание задачи
+                     profile              - информация о пользователе
+                     help                 - показать команды
+                     exit                 - выйти
 
-Флаги для view:
- -i, --index          - показывать индекс задачи
- -s, --status         - показывать статус задачи
- -d, --update-date    - показывать дату последнего изменения
- -a, --all            - показывать всё (индекс, статус, дату)
-");
-        }
+                    Флаги для view:
+                     -i, --index          - показывать индекс задачи
+                     -s, --status         - показывать статус задачи
+                     -d, --update-date    - показывать дату последнего изменения
+                     -a, --all            - показывать всё (индекс, статус, дату)
+                    ");
+         }
 
         static void AddMultiline(TodoList tasks)
         {
@@ -136,10 +147,15 @@ namespace TodoList
             }
 
             if (!string.IsNullOrWhiteSpace(fullText))
-                tasks.Add(new TodoItem(fullText));
+            {
+                TodoItem task = new TodoItem(fullText);
+                tasks.Add(task);
+                Console.WriteLine("Многострочная задача добавлена.");
+            }
             else
                 Console.WriteLine("Задача пуста, не добавлена.");
         }
+
         static void ParseAndView(TodoList tasks, string input)
         {
             var parts = input.Split(' ', StringSplitOptions.RemoveEmptyEntries);
@@ -152,7 +168,6 @@ namespace TodoList
             for (int i = 1; i < parts.Length; i++)
             {
                 string part = parts[i];
-
                 if (part.StartsWith("--"))
                 {
                     if (part == "--index") showIndex = true;
@@ -164,31 +179,21 @@ namespace TodoList
                 {
                     for (int j = 1; j < part.Length; j++)
                     {
-                        char flag = part[j];
-                        switch (flag)
+                        switch (part[j])
                         {
                             case 'i': showIndex = true; break;
                             case 's': showStatus = true; break;
                             case 'd': showDate = true; break;
                             case 'a': showAll = true; break;
-                            default:
-                                Console.WriteLine($"Неизвестный флаг: -{flag}");
-                                break;
                         }
                     }
-                }
-                else
-                {
-                    Console.WriteLine($"Неизвестный параметр: {part}");
                 }
             }
 
             if (showAll)
-            {
                 showIndex = showStatus = showDate = true;
-            }
 
-            tasks.View(showIndex: showIndex, showDone: showStatus, showDate: showDate);
+            tasks.View(showIndex, showStatus, showDate);
         }
     }
 }
