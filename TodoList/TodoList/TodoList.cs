@@ -63,10 +63,11 @@ namespace TodoList
                 for (int i = 0; i < count; i++)
                 {
                     string line = "";
-                    if (showIndex) line += (i + 1).ToString().PadRight(indexWidth) + " ";
-
-                    string taskText = items[i].Text.Length > textWidth ? items[i].Text.Substring(0, textWidth - 3) + "..." : items[i].Text;
-                    line += taskText.PadRight(textWidth) + " ";
+                    if (showIndex) line += (i + 1).ToString().PadRight(indexWidth) + "";
+                    string taskText = items[i].Text.Split('\n')[0];
+                    if (taskText.Length > textWidth)
+                    taskText = taskText.Substring(0, textWidth - 3) + "...";
+                line += taskText.PadRight(textWidth) + " ";
 
                     if (showDone) line += (items[i].IsDone ? "Сделано" : "Не сделано").PadRight(statusWidth) + " ";
                     if (showDate) line += items[i].LastUpdate.ToString("dd.MM.yyyy HH:mm").PadRight(dateWidth);
