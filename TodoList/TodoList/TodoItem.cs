@@ -1,21 +1,23 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace TodoList
     {
         internal class TodoItem
         {
-            public string Text;
-            public bool IsDone;
-            public DateTime LastUpdate; 
+            private string Text;
+            private bool IsDone;
+            private DateTime LastUpdate; 
             public TodoItem(string text)
             {
-                Text = text;
-                IsDone = false;
-                LastUpdate = DateTime.Now;
+                this.Text = text;
+                this.IsDone = false;
+                this.LastUpdate = DateTime.Now;
             }
             public void MarkDone()
             {
@@ -27,7 +29,19 @@ namespace TodoList
                 Text = newText;
                 LastUpdate = DateTime.Now;
             }
-            public string GetShortInfo()
+            public string GetText()
+            {
+                return Text;
+            }
+            public bool GetIsDone()
+            {
+                return IsDone;
+            }
+            public DateTime GetLastUpdate()
+            {
+                return LastUpdate;
+            }
+        public string GetShortInfo()
             {
                 string shortText = Text.Length > 30 ? Text.Substring(0, 27) + "..." : Text;
                 string status = IsDone ? "Сделано" : "Не сделано";

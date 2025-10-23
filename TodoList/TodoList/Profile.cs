@@ -18,13 +18,18 @@ namespace TodoList
                 this.lastName = lastName;
                 this.birthYear = birthYear;
             }
-            public string FirstName => firstName;
-            public string LastName => lastName;
-            public int BirthYear => birthYear;
-            public string GetInfo()
+        public string GetFullName()
+        {
+            return firstName + " " + lastName;
+        }
+        public int GetAge()
+        {
+            return DateTime.Today.Year - birthYear;
+        }
+
+        public string GetInfo()
             {
-                int age = DateTime.Today.Year - birthYear;
-                return $"{firstName} {lastName}, возраст {age}";
+            return $"{GetFullName()}, возраст {GetAge()} лет";
             }
         }
     }
