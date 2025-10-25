@@ -68,19 +68,19 @@ namespace TodoList
                 if (showIndex)
                     line += (i + 1).ToString().PadRight(3);
 
-                line += items[i].GetText().Replace('\n', ' ');
+                line += items[i].Text.Replace('\n', ' ');
                 if (line.Length > 30) line = line.Substring(0, 27) + "...";
                 line = line.PadRight(30);
 
                 if (showDone)
                 {
-                    string status = items[i].GetIsDone() ? "Сделано" : "Не сделано";
+                    string status = items[i].IsDone ? "Сделано" : "Не сделано";
                     line += " | " + status.PadRight(10);
                 }
 
                 if (showDate)
                 {
-                    line += " | " + items[i].GetLastUpdate().ToString("dd.MM.yyyy HH:mm");
+                    line += " | " + items[i].LastUpdate.ToString("dd.MM.yyyy HH:mm");
                 }
 
                 Console.WriteLine(line);
