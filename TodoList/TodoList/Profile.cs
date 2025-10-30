@@ -5,31 +5,28 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace TodoList
+{
+    internal class Profile
     {
-        internal class Profile
-        {
         private string fullName;
-        private int birthYear;
+        private DateTime birthDate;
 
-            public Profile(string fullName, int birthYear)
-            {
+        public Profile(string fullName, DateTime birthDate)
+        {
             this.fullName = fullName;
-            this.birthYear = birthYear;
-            }
-        public string GetFullName()
-        {
-            return fullName;
-        }
-        public int GetAge()
-        {
-            return DateTime.Today.Year - birthYear;
+            this.birthDate = birthDate;
         }
 
         public string GetInfo()
-            {
-            return $"{fullName}, возраст {GetAge()} лет";
-            }
+        {
+            int age = DateTime.Now.Year - birthDate.Year;
+            if (DateTime.Now.DayOfYear < birthDate.DayOfYear)
+                age--;
+
+            return $"{fullName}, возраст: {age} лет";
         }
     }
+}
+
 
 
