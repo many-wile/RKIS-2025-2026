@@ -1,4 +1,4 @@
-﻿namespace TodoList
+﻿namespace TodoList.Commands
 {
     internal class DeleteCommand : ICommand
     {

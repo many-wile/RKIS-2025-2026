@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace TodoList
+namespace TodoList.Commands
 {
     internal class AddCommand : ICommand
     {
