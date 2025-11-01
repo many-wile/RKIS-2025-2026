@@ -1,5 +1,4 @@
 ﻿using System;
-
 namespace TodoList.Commands
 {
     internal class AddCommand : ICommand
