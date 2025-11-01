@@ -1,5 +1,4 @@
-﻿using System;
-namespace TodoList.Commands
+﻿namespace TodoList.Commands
 {
     internal interface ICommand
     {

@@ -1,5 +1,6 @@
 ﻿using System;
-namespace TodoList.Commands
+using TodoList.Commands;
+namespace TodoList
 {
     static class CommandParser
     {
@@ -67,6 +68,10 @@ namespace TodoList.Commands
             if (inputString == "profile")
             {
                 return new ProfileCommand(profile);
+            }
+            if (inputString == "help")
+            {
+                return new CommandHelp();
             }
             return null;
         }
