@@ -47,5 +47,10 @@ namespace TodoList
             string status = isDone ? "Сделано" : "Не сделано";
             return $"Текст задачи:\n{text}\nСтатус: {status}\nДата последнего изменения: {lastUpdate:dd.MM.yyyy HH:mm}";
         }
+        internal void SetLoadedState(bool done, DateTime updateDate)
+        {
+            isDone = done;
+            lastUpdate = updateDate;
+        }
     }
 }

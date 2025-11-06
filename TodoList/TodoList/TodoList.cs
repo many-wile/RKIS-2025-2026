@@ -6,8 +6,8 @@ namespace TodoList
 {
     internal class TodoList
     {
-        private TodoItem[] items;
-        private int count;
+        public TodoItem[] items;
+        public int count;
         public TodoList()
         {
             items = new TodoItem[2];
