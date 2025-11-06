@@ -68,9 +68,10 @@ namespace TodoList
                     Console.WriteLine("Неверный формат даты! Профиль не будет создан.");
                     return null;
                 }
-                profile = new Profile(fullName, birthDate);
-                FileManager.SaveProfile(profile, filePath);
-            }
+
+                profile = new Profile(fullName, birthDate); 
+                FileManager.SaveProfile(profile, filePath); 
+            } 
             return profile;
         }
     }
