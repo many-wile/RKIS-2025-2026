@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Collections.Generic;
 namespace TodoList
 {
     static class FileManager
@@ -34,7 +35,7 @@ namespace TodoList
             try
             {
                 string[] lines = File.ReadAllLines(filePath);
-                if (lines.Length == 2) 
+                if (lines.Length == 2)
                 {
                     string fullName = lines[0];
                     if (DateTime.TryParse(lines[1], out DateTime birthDate))
@@ -58,18 +59,19 @@ namespace TodoList
             {
                 using (StreamWriter sw = new StreamWriter(filePath))
                 {
-                    sw.WriteLine("Text,IsDone,LastUpdate");
+                    sw.WriteLine("Index;Text;IsDone;LastUpdate");
                     for (int i = 0; i < todos.count; i++)
                     {
                         TodoItem item = todos.GetItem(i + 1);
                         if (item != null)
                         {
-                            string escapedText = item.Text.Replace("\"", "\"\"");
-                            if (escapedText.Contains(",") || escapedText.Contains("\n"))
+                            string processedText = item.Text.Replace("\n", "\\n");
+                            processedText = processedText.Replace("\"", "\"\"");
+                            if (processedText.Contains(";") || processedText.Contains("\\n"))
                             {
-                                escapedText = $"\"{escapedText}\"";
+                                processedText = $"\"{processedText}\"";
                             }
-                            sw.WriteLine($"{escapedText},{item.IsDone},{item.LastUpdate:o}");
+                            sw.WriteLine($"{i};{processedText};{item.IsDone};{item.LastUpdate:o}");
                         }
                     }
                 }
@@ -91,20 +93,24 @@ namespace TodoList
             try
             {
                 string[] lines = File.ReadAllLines(filePath);
-                if (lines.Length <= 1) 
+                if (lines.Length <= 1)
                 {
                     Console.WriteLine($"Файл задач пуст или содержит только заголовок: {filePath}.");
                     return todos;
                 }
-                for (int i = 1; i < lines.Length; i++) 
+                for (int i = 1; i < lines.Length; i++)
                 {
                     string line = lines[i];
-                    string[] parts = ParseCsvLine(line); 
-                    if (parts.Length == 3)
+                    List<string> parts = ParseCsvLine(line, ';');
+                    if (parts.Count == 4)
                     {
-                        string text = parts[0];
-                        if (bool.TryParse(parts[1], out bool isDone) && DateTime.TryParse(parts[2], out DateTime lastUpdate))
+                        string text = parts[1];
+                        string isDoneString = parts[2];
+                        string lastUpdateString = parts[3];
+                        if (bool.TryParse(isDoneString, out bool isDone) && DateTime.TryParse(lastUpdateString, out DateTime lastUpdate))
                         {
+                            text = text.Replace("\\n", "\n");
+
                             TodoItem item = new TodoItem(text);
                             item.SetLoadedState(isDone, lastUpdate);
                             todos.Add(item);
@@ -128,36 +134,34 @@ namespace TodoList
                 return new TodoList();
             }
         }
-        private static string[] ParseCsvLine(string line)
+        private static List<string> ParseCsvLine(string line, char separator)
         {
-            var parts = new System.Collections.Generic.List<string>();
+            var parts = new List<string>();
             bool inQuote = false;
             int start = 0;
-
             for (int i = 0; i < line.Length; i++)
             {
                 if (line[i] == '"')
                 {
                     if (i + 1 < line.Length && line[i + 1] == '"')
                     {
-                        i++; 
+                        i++;
                     }
                     else
                     {
-                        inQuote = !inQuote;
+                        inQuote = !inQuote; 
                     }
                 }
-                else if (line[i] == ',' && !inQuote) 
+                else if (line[i] == separator && !inQuote)
                 {
                     string part = line.Substring(start, i - start);
                     parts.Add(TrimQuotesAndUnescape(part));
                     start = i + 1;
                 }
             }
-            string lastPart = line.Substring(start);
+            string lastPart = line.Substring(start); 
             parts.Add(TrimQuotesAndUnescape(lastPart));
-
-            return parts.ToArray();
+            return parts;
         }
         private static string TrimQuotesAndUnescape(string input)
         {
