@@ -78,7 +78,6 @@ namespace TodoList
 						{
 							processedText = $"\"{processedText}\"";
 						}
-
 						linesToWrite.Add($"{i};{processedText};{item.IsDone};{item.LastUpdate:o}");
 					}
 				}
@@ -101,7 +100,6 @@ namespace TodoList
 			try
 			{
 				string[] lines = File.ReadAllLines(filePath);
-
 				if (lines.Length <= 1)
 				{
 					Console.WriteLine($"Файл задач пуст или содержит только заголовок: {filePath}.");
@@ -120,9 +118,7 @@ namespace TodoList
 						if (bool.TryParse(isDoneString, out bool isDone) && DateTime.TryParse(lastUpdateString, out DateTime lastUpdate))
 						{
 							text = text.Replace("\\n", "\n");
-
-							TodoItem item = new TodoItem(text);
-							item.SetLoadedState(isDone, lastUpdate);
+							TodoItem item = new TodoItem(text, isDone, lastUpdate);
 							todos.Add(item);
 						}
 						else
@@ -171,7 +167,6 @@ namespace TodoList
 			}
 			string lastPart = line.Substring(start);
 			parts.Add(TrimQuotesAndUnescape(lastPart));
-
 			return parts;
 		}
 		private static string TrimQuotesAndUnescape(string input)
