@@ -20,7 +20,6 @@ namespace TodoList
 			this.isDone = isDone;
 			this.lastUpdate = lastUpdate;
 		}
-
 		public string Text
 		{
 			get { return text; }

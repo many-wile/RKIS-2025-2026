@@ -67,7 +67,7 @@ namespace TodoList
 			{
 				List<string> linesToWrite = new List<string>();
 				linesToWrite.Add("Index;Text;IsDone;LastUpdate");
-				for (int i = 0; i < todos.Count; i++)
+				for (int i = 0; i < todos.count; i++)
 				{
 					TodoItem item = todos.GetItem(i + 1);
 					if (item != null)
