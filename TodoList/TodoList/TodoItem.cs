@@ -1,41 +1,30 @@
-﻿using TodoList.Commands;
-using System;
-
+﻿using System;
 namespace TodoList
 {
 	internal class TodoItem
 	{
 		private string text;
-		private bool isDone;
+		public TodoStatus Status { get; set; }
 		private DateTime lastUpdate;
 		public TodoItem(string text)
 		{
 			this.text = text;
-			this.isDone = false;
+			this.Status = TodoStatus.NotStarted;
 			this.lastUpdate = DateTime.Now;
 		}
-		public TodoItem(string text, bool isDone, DateTime lastUpdate)
+		public TodoItem(string text, TodoStatus status, DateTime lastUpdate)
 		{
 			this.text = text;
-			this.isDone = isDone;
+			this.Status = status;
 			this.lastUpdate = lastUpdate;
 		}
 		public string Text
 		{
 			get { return text; }
 		}
-		public bool IsDone
-		{
-			get { return isDone; }
-		}
 		public DateTime LastUpdate
 		{
 			get { return lastUpdate; }
-		}
-		public void MarkDone()
-		{
-			isDone = true;
-			lastUpdate = DateTime.Now;
 		}
 		public void UpdateText(string newText)
 		{
@@ -45,12 +34,12 @@ namespace TodoList
 		public string GetShortInfo()
 		{
 			string shortText = text.Length > 30 ? text.Substring(0, 27) + "..." : text;
-			string status = isDone ? "Сделано" : "Не сделано";
+			string status = this.Status.ToString();
 			return $"{shortText} ({status}, обновлено {lastUpdate:dd.MM.yyyy HH:mm})";
 		}
 		public string GetFullInfo()
 		{
-			string status = isDone ? "Сделано" : "Не сделано";
+			string status = this.Status.ToString();
 			return $"Текст задачи:\n{text}\nСтатус: {status}\nДата последнего изменения: {lastUpdate:dd.MM.yyyy HH:mm}";
 		}
 	}
