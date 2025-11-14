@@ -1,100 +1,113 @@
-﻿using TodoList.Commands;
-using System;
-
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 
 namespace TodoList
 {
-    internal class TodoList
-    {
-        public TodoItem[] items;
-        public int count;
-        public TodoList()
-        {
-            items = new TodoItem[2];
-            count = 0;
-        }
-        public void Add(TodoItem item)
-        {
-            if (count >= items.Length)
-                ExpandArray();
+	internal class TodoList : IEnumerable<TodoItem>
+	{
+		private List<TodoItem> items;
+		public TodoList()
+		{
+			items = new List<TodoItem>();
+		}
+		public int Count
+		{
+			get { return items.Count; }
+		}
+		public TodoItem this[int index]
+		{
+			get
+			{
+				if (index < 0 || index >= items.Count)
+				{
+					throw new IndexOutOfRangeException("Индекс находится за пределами списка задач.");
+				}
+				return items[index];
+			}
+			set
+			{
+				if (index < 0 || index >= items.Count)
+				{
+					throw new IndexOutOfRangeException("Индекс находится за пределами списка задач.");
+				}
+				items[index] = value;
+			}
+		}
+		public void Add(TodoItem item)
+		{
+			items.Add(item);
+		}
+		public void Delete(int index)
+		{
+			int internalIndex = index - 1;
+			if (internalIndex < 0 || internalIndex >= items.Count)
+			{
+				Console.WriteLine("Задачи с таким номером нет.");
+				return;
+			}
+			items.RemoveAt(internalIndex);
+			Console.WriteLine($"Задача {index} удалена.");
+		}
+		public TodoItem GetItem(int index)
+		{
+			int internalIndex = index - 1;
 
-            items[count] = item;
-            count++;
-        }
+			if (internalIndex < 0 || internalIndex >= items.Count)
+			{
+				return null;
+			}
+			return items[internalIndex];
+		}
+		public void View(bool showIndex, bool showDone, bool showDate)
+		{
+			if (items.Count == 0)
+			{
+				Console.WriteLine("Нет задач.");
+				return;
+			}
+			string header = "";
+			if (showIndex) header += "№  ";
+			header += "Задача".PadRight(30);
+			if (showDone) header += " | Статус".PadRight(10);
+			if (showDate) header += " | Дата обновления".PadRight(20);
+			Console.WriteLine(header);
+			Console.WriteLine(new string('-', header.Length));
+			for (int i = 0; i < items.Count; i++)
+			{
+				string line = "";
 
-        public void Delete(int index)
-        {
-            if (index < 1 || index > count)
-            {
-                Console.WriteLine("Задачи с таким номером нет.");
-                return;
-            }
+				if (showIndex)
+					line += (i + 1).ToString().PadRight(3);
 
-            int i = index - 1;
-            for (int j = i; j < count - 1; j++)
-                items[j] = items[j + 1];
+				line += items[i].Text.Replace('\n', ' ');
+				if (line.Length > 30) line = line.Substring(0, 27) + "...";
+				line = line.PadRight(30);
 
-            items[count - 1] = null;
-            count--;
-            Console.WriteLine($"Задача {index} удалена.");
-        }
-        public TodoItem GetItem(int index)
-        {
-            if (index < 1 || index > count)
-                return null;
-            return items[index - 1];
-        }
+				if (showDone)
+				{
+					string status = items[i].IsDone ? "Сделано" : "Не сделано";
+					line += " | " + status.PadRight(10);
+				}
 
-        public void View(bool showIndex, bool showDone, bool showDate)
-        {
-            if (count == 0)
-            {
-                Console.WriteLine("Нет задач.");
-                return;
-            }
-            string header = "";
-            if (showIndex) header += "№  ";
-            header += "Задача".PadRight(30);
-            if (showDone) header += " | Статус".PadRight(10);
-            if (showDate) header += " | Дата обновления".PadRight(20);
-            Console.WriteLine(header);
-            Console.WriteLine(new string('-', header.Length));
-            for (int i = 0; i < count; i++)
-            {
-                string line = "";
-
-                if (showIndex)
-                    line += (i + 1).ToString().PadRight(3);
-
-                line += items[i].Text.Replace('\n', ' ');
-                if (line.Length > 30) line = line.Substring(0, 27) + "...";
-                line = line.PadRight(30);
-
-                if (showDone)
-                {
-                    string status = items[i].IsDone ? "Сделано" : "Не сделано";
-                    line += " | " + status.PadRight(10);
-                }
-
-                if (showDate)
-                {
-                    line += " | " + items[i].LastUpdate.ToString("dd.MM.yyyy HH:mm");
-                }
-
-                Console.WriteLine(line);
-            }
-
-            Console.WriteLine(new string('-', header.Length));
-        }
-        private void ExpandArray()
-        {
-            int newSize = items.Length * 2;
-            TodoItem[] newArray = new TodoItem[newSize];
-
-            for (int i = 0; i < items.Length; i++)
-                newArray[i] = items[i];
-
-            items = newArray;
-        }
-    }
+				if (showDate)
+				{
+					line += " | " + items[i].LastUpdate.ToString("dd.MM.yyyy HH:mm");
+				}
+				Console.WriteLine(line);
+			}
+			Console.WriteLine(new string('-', header.Length));
+		}
+		public IEnumerator<TodoItem> GetEnumerator()
+		{
+			for (int i = 0; i < items.Count; i++)
+			{
+				yield return items[i];
+			}
+		}
+		IEnumerator IEnumerable.GetEnumerator()
+		{
+			return this.GetEnumerator();
+		}
+	}
 }

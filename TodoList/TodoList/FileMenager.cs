@@ -67,7 +67,7 @@ namespace TodoList
 			{
 				List<string> linesToWrite = new List<string>();
 				linesToWrite.Add("Index;Text;IsDone;LastUpdate");
-				for (int i = 0; i < todos.count; i++)
+				for (int i = 0; i < todos.Count; i++)
 				{
 					TodoItem item = todos.GetItem(i + 1);
 					if (item != null)
@@ -78,6 +78,7 @@ namespace TodoList
 						{
 							processedText = $"\"{processedText}\"";
 						}
+
 						linesToWrite.Add($"{i};{processedText};{item.IsDone};{item.LastUpdate:o}");
 					}
 				}
@@ -100,6 +101,7 @@ namespace TodoList
 			try
 			{
 				string[] lines = File.ReadAllLines(filePath);
+
 				if (lines.Length <= 1)
 				{
 					Console.WriteLine($"Файл задач пуст или содержит только заголовок: {filePath}.");
@@ -109,6 +111,7 @@ namespace TodoList
 				{
 					string line = lines[i];
 					List<string> parts = ParseCsvLine(line, ';');
+
 					if (parts.Count == 4)
 					{
 						string text = parts[1];
@@ -145,6 +148,7 @@ namespace TodoList
 			var parts = new List<string>();
 			bool inQuote = false;
 			int start = 0;
+
 			for (int i = 0; i < line.Length; i++)
 			{
 				if (line[i] == '"')
@@ -167,6 +171,7 @@ namespace TodoList
 			}
 			string lastPart = line.Substring(start);
 			parts.Add(TrimQuotesAndUnescape(lastPart));
+
 			return parts;
 		}
 		private static string TrimQuotesAndUnescape(string input)
