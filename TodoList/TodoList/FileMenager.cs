@@ -1,5 +1,4 @@
-﻿using TodoList;
-using System;
+﻿using System;
 using System.IO;
 using System.Collections.Generic;
 namespace TodoList
@@ -21,7 +20,6 @@ namespace TodoList
 				}
 			}
 		}
-
 		public static void SaveProfile(Profile profile, string filePath)
 		{
 			try
@@ -34,7 +32,6 @@ namespace TodoList
 				Console.WriteLine($"Ошибка при сохранении профиля в '{filePath}': {ex.Message}");
 			}
 		}
-
 		public static Profile LoadProfile(string filePath)
 		{
 			if (!File.Exists(filePath))
@@ -63,7 +60,6 @@ namespace TodoList
 				return null;
 			}
 		}
-
 		public static void SaveTodos(TodoList todos, string filePath)
 		{
 			try
@@ -86,7 +82,6 @@ namespace TodoList
 						linesToWrite.Add($"{i};{processedText};{item.Status.ToString()};{item.LastUpdate:o}");
 					}
 				}
-
 				File.WriteAllLines(filePath, linesToWrite);
 				Console.WriteLine($"Задачи успешно сохранены в {filePath}");
 			}
@@ -95,7 +90,6 @@ namespace TodoList
 				Console.WriteLine($"Ошибка при сохранении задач в '{filePath}': {ex.Message}");
 			}
 		}
-
 		public static TodoList LoadTodos(string filePath)
 		{
 			TodoList todos = new TodoList();
@@ -104,28 +98,23 @@ namespace TodoList
 				Console.WriteLine($"Файл задач не найден: {filePath}. Будет создан пустой список задач.");
 				return todos;
 			}
-
 			try
 			{
 				string[] lines = File.ReadAllLines(filePath);
-
 				if (lines.Length <= 1)
 				{
 					Console.WriteLine($"Файл задач пуст или содержит только заголовок: {filePath}.");
 					return todos;
 				}
-
 				for (int i = 1; i < lines.Length; i++)
 				{
 					string line = lines[i];
 					List<string> parts = ParseCsvLine(line, ';');
-
 					if (parts.Count == 4)
 					{
 						string text = parts[1];
 						string statusString = parts[2];
 						string lastUpdateString = parts[3];
-
 						if (Enum.TryParse<TodoStatus>(statusString, true, out TodoStatus status) && DateTime.TryParse(lastUpdateString, out DateTime lastUpdate))
 						{
 							text = text.Replace("\\n", "\n");
@@ -151,13 +140,11 @@ namespace TodoList
 				return new TodoList();
 			}
 		}
-
 		private static List<string> ParseCsvLine(string line, char separator)
 		{
 			var parts = new List<string>();
 			bool inQuote = false;
 			int start = 0;
-
 			for (int i = 0; i < line.Length; i++)
 			{
 				if (line[i] == '"')
@@ -180,7 +167,6 @@ namespace TodoList
 			}
 			string lastPart = line.Substring(start);
 			parts.Add(TrimQuotesAndUnescape(lastPart));
-
 			return parts;
 		}
 		private static string TrimQuotesAndUnescape(string input)

@@ -43,12 +43,23 @@ namespace TodoList
 		public TodoItem GetItem(int index)
 		{
 			int internalIndex = index - 1;
-
 			if (internalIndex < 0 || internalIndex >= items.Count)
 			{
 				return null;
 			}
 			return items[internalIndex];
+		}
+		public void SetStatus(int index, TodoStatus newStatus)
+		{
+			var item = GetItem(index);
+			if (item != null)
+			{
+				item.ChangeStatus(newStatus);
+			}
+			else
+			{
+				Console.WriteLine("Задача с таким номером не найдена.");
+			}
 		}
 		public void View(bool showIndex, bool showStatus, bool showDate)
 		{
@@ -64,7 +75,6 @@ namespace TodoList
 			if (showDate) header += " | Дата обновления".PadRight(20);
 			Console.WriteLine(header);
 			Console.WriteLine(new string('-', header.Length));
-
 			for (int i = 0; i < items.Count; i++)
 			{
 				string line = "";

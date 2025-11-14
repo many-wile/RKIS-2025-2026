@@ -14,16 +14,8 @@ namespace TodoList.Commands
 		}
 		public void Execute()
 		{
-			var item = _todoList.GetItem(_index);
-			if (item != null)
-			{
-				item.ChangeStatus(_newStatus);
-				Console.WriteLine($"Статус задачи {_index} изменен на '{_newStatus}'.");
-			}
-			else
-			{
-				Console.WriteLine("Задача с таким номером не найдена.");
-			}
+			_todoList.SetStatus(_index, _newStatus);
+			Console.WriteLine($"Статус задачи {_index} изменен на '{_newStatus}'.");
 		}
 	}
 }
