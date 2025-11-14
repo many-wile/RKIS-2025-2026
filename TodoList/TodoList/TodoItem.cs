@@ -4,7 +4,7 @@ namespace TodoList
 	internal class TodoItem
 	{
 		private string text;
-		public TodoStatus Status { get; set; }
+		public TodoStatus Status { get; private set; }
 		private DateTime lastUpdate;
 		public TodoItem(string text)
 		{
@@ -25,6 +25,11 @@ namespace TodoList
 		public DateTime LastUpdate
 		{
 			get { return lastUpdate; }
+		}
+		public void ChangeStatus(TodoStatus newStatus)
+		{
+			this.Status = newStatus;
+			this.lastUpdate = DateTime.Now;
 		}
 		public void UpdateText(string newText)
 		{

@@ -1,7 +1,7 @@
-﻿using System;
+﻿using TodoList;
+using System;
 using System.IO;
 using System.Collections.Generic;
-
 namespace TodoList
 {
 	static class FileManager
@@ -21,6 +21,7 @@ namespace TodoList
 				}
 			}
 		}
+
 		public static void SaveProfile(Profile profile, string filePath)
 		{
 			try
@@ -33,6 +34,7 @@ namespace TodoList
 				Console.WriteLine($"Ошибка при сохранении профиля в '{filePath}': {ex.Message}");
 			}
 		}
+
 		public static Profile LoadProfile(string filePath)
 		{
 			if (!File.Exists(filePath))
@@ -61,15 +63,17 @@ namespace TodoList
 				return null;
 			}
 		}
+
 		public static void SaveTodos(TodoList todos, string filePath)
 		{
 			try
 			{
 				List<string> linesToWrite = new List<string>();
-				linesToWrite.Add("Index;Text;IsDone;LastUpdate");
+				linesToWrite.Add("Index;Text;Status;LastUpdate");
+
 				for (int i = 0; i < todos.Count; i++)
 				{
-					TodoItem item = todos.GetItem(i + 1);
+					TodoItem item = todos[i];
 					if (item != null)
 					{
 						string processedText = item.Text.Replace("\n", "\\n");
@@ -79,9 +83,10 @@ namespace TodoList
 							processedText = $"\"{processedText}\"";
 						}
 
-						linesToWrite.Add($"{i};{processedText};{item.IsDone};{item.LastUpdate:o}");
+						linesToWrite.Add($"{i};{processedText};{item.Status.ToString()};{item.LastUpdate:o}");
 					}
 				}
+
 				File.WriteAllLines(filePath, linesToWrite);
 				Console.WriteLine($"Задачи успешно сохранены в {filePath}");
 			}
@@ -90,6 +95,7 @@ namespace TodoList
 				Console.WriteLine($"Ошибка при сохранении задач в '{filePath}': {ex.Message}");
 			}
 		}
+
 		public static TodoList LoadTodos(string filePath)
 		{
 			TodoList todos = new TodoList();
@@ -98,6 +104,7 @@ namespace TodoList
 				Console.WriteLine($"Файл задач не найден: {filePath}. Будет создан пустой список задач.");
 				return todos;
 			}
+
 			try
 			{
 				string[] lines = File.ReadAllLines(filePath);
@@ -107,6 +114,7 @@ namespace TodoList
 					Console.WriteLine($"Файл задач пуст или содержит только заголовок: {filePath}.");
 					return todos;
 				}
+
 				for (int i = 1; i < lines.Length; i++)
 				{
 					string line = lines[i];
@@ -115,18 +123,18 @@ namespace TodoList
 					if (parts.Count == 4)
 					{
 						string text = parts[1];
-						string isDoneString = parts[2];
+						string statusString = parts[2];
 						string lastUpdateString = parts[3];
 
-						if (bool.TryParse(isDoneString, out bool isDone) && DateTime.TryParse(lastUpdateString, out DateTime lastUpdate))
+						if (Enum.TryParse<TodoStatus>(statusString, true, out TodoStatus status) && DateTime.TryParse(lastUpdateString, out DateTime lastUpdate))
 						{
 							text = text.Replace("\\n", "\n");
-							TodoItem item = new TodoItem(text, isDone, lastUpdate);
+							TodoItem item = new TodoItem(text, status, lastUpdate);
 							todos.Add(item);
 						}
 						else
 						{
-							Console.WriteLine($"Предупреждение: Неверный формат bool или DateTime в строке: {line}");
+							Console.WriteLine($"Предупреждение: Неверный формат Status или DateTime в строке: {line}");
 						}
 					}
 					else
@@ -143,6 +151,7 @@ namespace TodoList
 				return new TodoList();
 			}
 		}
+
 		private static List<string> ParseCsvLine(string line, char separator)
 		{
 			var parts = new List<string>();
