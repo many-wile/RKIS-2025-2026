@@ -4,7 +4,7 @@ namespace TodoList
 {
 	static class CommandParser
 	{
-		public static ICommand Parse(string inputString, TodoList todoList, Profile profile)
+		public static ICommand Parse(string inputString)
 		{
 			if (string.IsNullOrWhiteSpace(inputString))
 				return null;
@@ -27,12 +27,12 @@ namespace TodoList
 					if (!string.IsNullOrEmpty(text)) text += "\n";
 					text += line;
 				}
-				return new AddCommand(todoList, text);
+				return new AddCommand(text);
 			}
 			if (inputString.StartsWith("add "))
 			{
 				string text = inputString.Substring(4).Trim();
-				return new AddCommand(todoList, text);
+				return new AddCommand(text);
 			}
 			if (inputString.StartsWith("status "))
 			{
@@ -41,7 +41,7 @@ namespace TodoList
 				{
 					if (Enum.TryParse<TodoStatus>(parts[2], true, out TodoStatus newStatus))
 					{
-						return new StatusCommand(todoList, idx, newStatus);
+						return new StatusCommand(idx, newStatus);
 					}
 					else
 					{
@@ -55,16 +55,16 @@ namespace TodoList
 			{
 				string[] parts = inputString.Split(' ', 3);
 				if (parts.Length == 3 && int.TryParse(parts[1], out int idx))
-					return new UpdateCommand(todoList, idx, parts[2]);
+					return new UpdateCommand(idx, parts[2]);
 			}
 			if (inputString.StartsWith("delete "))
 			{
 				if (int.TryParse(inputString.Substring(7), out int idx))
-					return new DeleteCommand(todoList, idx);
+					return new DeleteCommand(idx);
 			}
 			if (inputString.StartsWith("view"))
 			{
-				ViewCommand command = new ViewCommand(todoList);
+				ViewCommand command = new ViewCommand();
 				string[] parts = inputString.Split(' ', StringSplitOptions.RemoveEmptyEntries);
 				for (int i = 1; i < parts.Length; i++)
 				{
@@ -84,7 +84,7 @@ namespace TodoList
 			}
 			if (inputString == "profile")
 			{
-				return new ProfileCommand(profile);
+				return new ProfileCommand();
 			}
 			return null;
 		}

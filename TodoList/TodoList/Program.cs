@@ -13,36 +13,36 @@ namespace TodoList
 		{
 			Console.WriteLine("Работу выполнили Нестеренко и Горелов");
 			FileManager.EnsureDataDirectory(DataDirectory);
-			Profile profile = LoadOrCreateProfile(Path.Combine(DataDirectory, ProfileFileName));
-			if (profile == null)
+			AppInfo.CurrentProfile = LoadOrCreateProfile(Path.Combine(DataDirectory, ProfileFileName));
+			if (AppInfo.CurrentProfile == null)
 			{
 				return;
 			}
-			TodoList todoList = FileManager.LoadTodos(Path.Combine(DataDirectory, TodosFileName));
-			if (todoList == null)
+			AppInfo.Todos = FileManager.LoadTodos(Path.Combine(DataDirectory, TodosFileName));
+			if (AppInfo.Todos == null)
 			{
-				todoList = new TodoList();
+				AppInfo.Todos = new TodoList();
 			}
 			Console.WriteLine("Введите команду (help — для списка команд):");
 			while (true)
 			{
 				Console.Write("> ");
 				string input = Console.ReadLine()?.Trim();
-
 				if (string.IsNullOrWhiteSpace(input))
 					continue;
 				if (input.ToLower() == "exit")
 				{
-					FileManager.SaveTodos(todoList, Path.Combine(DataDirectory, TodosFileName));
+					FileManager.SaveTodos(AppInfo.Todos, Path.Combine(DataDirectory, TodosFileName));
 					break;
 				}
-				ICommand command = CommandParser.Parse(input, todoList, profile);
+				ICommand command = CommandParser.Parse(input);
 				if (command != null)
 				{
 					command.Execute();
+
 					if (command is AddCommand || command is DeleteCommand || command is UpdateCommand || command is StatusCommand)
 					{
-						FileManager.SaveTodos(todoList, Path.Combine(DataDirectory, TodosFileName));
+						FileManager.SaveTodos(AppInfo.Todos, Path.Combine(DataDirectory, TodosFileName));
 					}
 				}
 				else
