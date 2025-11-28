@@ -28,6 +28,7 @@ namespace TodoList
 			{
 				Console.Write("> ");
 				string input = Console.ReadLine()?.Trim();
+
 				if (string.IsNullOrWhiteSpace(input))
 					continue;
 				if (input.ToLower() == "exit")
@@ -48,7 +49,7 @@ namespace TodoList
 						AppInfo.RedoStack.Clear();
 						FileManager.SaveTodos(AppInfo.Todos, Path.Combine(DataDirectory, TodosFileName));
 					}
-					else if (command is UndoCommand)
+					else if (command is UndoCommand || command is RedoCommand)
 					{
 						FileManager.SaveTodos(AppInfo.Todos, Path.Combine(DataDirectory, TodosFileName));
 					}
