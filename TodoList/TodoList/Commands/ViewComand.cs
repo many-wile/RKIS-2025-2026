@@ -18,8 +18,9 @@ namespace TodoList.Commands
 			}
 			AppInfo.Todos.View(ShowIndex, ShowDone, ShowDate);
 		}
-		public void Undo()
+		public void Unexecute()
 		{
+
 		}
 	}
 }

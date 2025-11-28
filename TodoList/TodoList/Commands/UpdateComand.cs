@@ -25,7 +25,7 @@ namespace TodoList.Commands
 				Console.WriteLine("Задача с таким номером не найдена.");
 			}
 		}
-		public void Undo()
+		public void Unexecute()
 		{
 			var item = AppInfo.Todos.GetItem(Index);
 			if (item != null && _oldText != null)

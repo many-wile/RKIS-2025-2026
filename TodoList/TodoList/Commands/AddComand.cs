@@ -5,6 +5,7 @@ namespace TodoList.Commands
 	{
 		public string TaskText { get; set; }
 		private TodoItem _addedItem;
+
 		public AddCommand(string taskText)
 		{
 			TaskText = taskText;
@@ -20,7 +21,7 @@ namespace TodoList.Commands
 			AppInfo.Todos.Add(_addedItem);
 			Console.WriteLine("Задача добавлена!");
 		}
-		public void Undo()
+		public void Unexecute()
 		{
 			if (AppInfo.Todos.Count > 0)
 			{

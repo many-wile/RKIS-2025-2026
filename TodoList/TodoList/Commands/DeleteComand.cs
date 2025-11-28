@@ -22,7 +22,7 @@ namespace TodoList.Commands
 				Console.WriteLine("Не удалось удалить задачу. Неверный индекс.");
 			}
 		}
-		public void Undo()
+		public void Unexecute()
 		{
 			if (_deletedItem != null)
 			{

@@ -9,10 +9,10 @@ namespace TodoList
 			if (string.IsNullOrWhiteSpace(inputString))
 				return null;
 			inputString = inputString.Trim();
-			if (inputString == "help")
+			string commandName = inputString.Split(' ')[0].ToLower();
+			if (commandName == "help")
 			{
-				ShowHelp();
-				return null;
+				return new CommandHelp();
 			}
 			if (inputString.StartsWith("add -m") || inputString.StartsWith("add --multiline"))
 			{
@@ -29,12 +29,15 @@ namespace TodoList
 				}
 				return new AddCommand(text);
 			}
-			if (inputString.StartsWith("add "))
+			if (commandName == "add")
 			{
-				string text = inputString.Substring(4).Trim();
-				return new AddCommand(text);
+				if (inputString.Length > 4)
+				{
+					string text = inputString.Substring(4).Trim();
+					return new AddCommand(text);
+				}
 			}
-			if (inputString.StartsWith("status "))
+			if (commandName == "status")
 			{
 				string[] parts = inputString.Split(' ', 3, StringSplitOptions.RemoveEmptyEntries);
 				if (parts.Length == 3 && int.TryParse(parts[1], out int idx))
@@ -51,18 +54,18 @@ namespace TodoList
 					}
 				}
 			}
-			if (inputString.StartsWith("update "))
+			if (commandName == "update")
 			{
 				string[] parts = inputString.Split(' ', 3);
 				if (parts.Length == 3 && int.TryParse(parts[1], out int idx))
 					return new UpdateCommand(idx, parts[2]);
 			}
-			if (inputString.StartsWith("delete "))
+			if (commandName == "delete")
 			{
 				if (int.TryParse(inputString.Substring(7), out int idx))
 					return new DeleteCommand(idx);
 			}
-			if (inputString.StartsWith("view"))
+			if (commandName == "view")
 			{
 				ViewCommand command = new ViewCommand();
 				string[] parts = inputString.Split(' ', StringSplitOptions.RemoveEmptyEntries);
@@ -82,35 +85,11 @@ namespace TodoList
 				}
 				return command;
 			}
-			if (inputString == "profile")
+			if (commandName == "profile")
 			{
 				return new ProfileCommand();
 			}
 			return null;
-		}
-		private static void ShowHelp()
-		{
-			Console.WriteLine(@"
-Доступные команды:
-add <текст>          - добавить задачу
-add -m / --multiline - многострочный ввод (!end - завершить)
-status <номер> <статус> - изменить статус задачи
-update <номер> <текст> - изменить текст задачи
-delete <номер>       - удалить задачу
-view [флаги]         - показать задачи
-profile              - показать профиль пользователя
-help                 - показать список команд
-exit                 - выход
-
-Доступные статусы для команды status:
-NotStarted, InProgress, Completed, Postponed, Failed
-
-Флаги для view:
--i, --index          - показывать индекс задачи
--s, --status         - показывать статус
--d, --update-date    - показывать дату изменения
--a, --all            - показывать всё
-");
 		}
 	}
 }
