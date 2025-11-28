@@ -14,6 +14,10 @@ namespace TodoList
 			{
 				return new CommandHelp();
 			}
+			if (commandName == "undo")
+			{
+				return new UndoCommand();
+			}
 			if (inputString.StartsWith("add -m") || inputString.StartsWith("add --multiline"))
 			{
 				Console.WriteLine("Введите задачу построчно. Для завершения '!end':");
