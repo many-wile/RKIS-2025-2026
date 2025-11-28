@@ -35,13 +35,33 @@ namespace TodoList
 					FileManager.SaveTodos(AppInfo.Todos, Path.Combine(DataDirectory, TodosFileName));
 					break;
 				}
+				if (input.ToLower() == "undo")
+				{
+					if (AppInfo.UndoStack.Count > 0)
+					{
+						ICommand lastCommand = AppInfo.UndoStack.Pop();
+						lastCommand.Unexecute();
+						AppInfo.RedoStack.Push(lastCommand);
+						FileManager.SaveTodos(AppInfo.Todos, Path.Combine(DataDirectory, TodosFileName));
+						Console.WriteLine("Действие отменено.");
+					}
+					else
+					{
+						Console.WriteLine("Нечего отменять.");
+					}
+					continue;
+				}
 				ICommand command = CommandParser.Parse(input);
 				if (command != null)
 				{
 					command.Execute();
-
-					if (command is AddCommand || command is DeleteCommand || command is UpdateCommand || command is StatusCommand)
+					if (command is AddCommand ||
+						command is DeleteCommand ||
+						command is UpdateCommand ||
+						command is StatusCommand)
 					{
+						AppInfo.UndoStack.Push(command);
+						AppInfo.RedoStack.Clear();
 						FileManager.SaveTodos(AppInfo.Todos, Path.Combine(DataDirectory, TodosFileName));
 					}
 				}
