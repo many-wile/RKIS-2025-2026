@@ -5,6 +5,7 @@ namespace TodoList.Commands
 	{
 		public int Index { get; set; }
 		public string NewText { get; set; }
+		private string _oldText;
 		public UpdateCommand(int index, string newText)
 		{
 			Index = index;
@@ -15,12 +16,21 @@ namespace TodoList.Commands
 			var item = AppInfo.Todos.GetItem(Index);
 			if (item != null)
 			{
+				_oldText = item.Text;
 				item.UpdateText(NewText);
 				Console.WriteLine($"Задача {Index} обновлена.");
 			}
 			else
 			{
 				Console.WriteLine("Задача с таким номером не найдена.");
+			}
+		}
+		public void Undo()
+		{
+			var item = AppInfo.Todos.GetItem(Index);
+			if (item != null && _oldText != null)
+			{
+				item.UpdateText(_oldText);
 			}
 		}
 	}

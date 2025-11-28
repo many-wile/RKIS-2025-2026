@@ -6,6 +6,7 @@ namespace TodoList
 	internal class TodoList : IEnumerable<TodoItem>
 	{
 		private List<TodoItem> items;
+
 		public TodoList()
 		{
 			items = new List<TodoItem>();
@@ -29,6 +30,14 @@ namespace TodoList
 		{
 			items.Add(item);
 		}
+		public void Insert(int index, TodoItem item)
+		{
+			int internalIndex = index - 1;
+			if (internalIndex < 0) internalIndex = 0;
+			if (internalIndex > items.Count) internalIndex = items.Count;
+
+			items.Insert(internalIndex, item);
+		}
 		public void Delete(int index)
 		{
 			int internalIndex = index - 1;
@@ -38,7 +47,6 @@ namespace TodoList
 				return;
 			}
 			items.RemoveAt(internalIndex);
-			Console.WriteLine($"Задача {index} удалена.");
 		}
 		public TodoItem GetItem(int index)
 		{
@@ -80,9 +88,9 @@ namespace TodoList
 				string line = "";
 				if (showIndex)
 					line += (i + 1).ToString().PadRight(3);
-				line += items[i].Text.Replace('\n', ' ');
-				if (line.Length > 30) line = line.Substring(0, 27) + "...";
-				line = line.PadRight(30);
+				string text = items[i].Text.Replace('\n', ' ');
+				if (text.Length > 27) text = text.Substring(0, 24) + "...";
+				line += text.PadRight(30);
 				if (showStatus)
 				{
 					string status = items[i].Status.ToString();

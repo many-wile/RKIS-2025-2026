@@ -17,5 +17,8 @@ namespace TodoList.Commands
 				Console.WriteLine("Профиль не загружен.");
 			}
 		}
+		public void Undo()
+		{
+		}
 	}
 }

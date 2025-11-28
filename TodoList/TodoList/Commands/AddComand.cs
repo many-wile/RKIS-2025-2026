@@ -4,6 +4,7 @@ namespace TodoList.Commands
 	internal class AddCommand : ICommand
 	{
 		public string TaskText { get; set; }
+		private TodoItem _addedItem;
 		public AddCommand(string taskText)
 		{
 			TaskText = taskText;
@@ -15,8 +16,16 @@ namespace TodoList.Commands
 				Console.WriteLine("Текст задачи не может быть пустым.");
 				return;
 			}
-			AppInfo.Todos.Add(new TodoItem(TaskText));
+			_addedItem = new TodoItem(TaskText);
+			AppInfo.Todos.Add(_addedItem);
 			Console.WriteLine("Задача добавлена!");
+		}
+		public void Undo()
+		{
+			if (AppInfo.Todos.Count > 0)
+			{
+				AppInfo.Todos.Delete(AppInfo.Todos.Count);
+			}
 		}
 	}
 }

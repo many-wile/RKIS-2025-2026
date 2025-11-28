@@ -7,7 +7,6 @@ namespace TodoList.Commands
 		public bool ShowDone { get; set; }
 		public bool ShowDate { get; set; }
 		public bool ShowAll { get; set; }
-
 		public ViewCommand()
 		{
 		}
@@ -18,6 +17,9 @@ namespace TodoList.Commands
 				ShowIndex = ShowDone = ShowDate = true;
 			}
 			AppInfo.Todos.View(ShowIndex, ShowDone, ShowDate);
+		}
+		public void Undo()
+		{
 		}
 	}
 }
