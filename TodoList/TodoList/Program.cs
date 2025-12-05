@@ -1,8 +1,8 @@
-﻿using TodoList.Commands;
-using System;
+﻿using System;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using TodoList.Commands;
 namespace TodoList
 {
 	internal class Program
@@ -31,8 +31,7 @@ namespace TodoList
 					Console.WriteLine("Неверный ввод. Пожалуйста, введите 'y' или 'n'.");
 				}
 			}
-			string userTodosPath = Path.Combine(DataDirectory, $"todos_{AppInfo.CurrentProfile.Login}.csv");
-			AppInfo.Todos = FileManager.LoadTodos(userTodosPath);
+			string userTodosPath = Path.Combine(DataDirectory, $"todos_{AppInfo.CurrentProfile.Id}.csv");
 			Console.WriteLine($"\nДобро пожаловать, {AppInfo.CurrentProfile.FirstName}! Введите команду (help — для списка команд):");
 			while (true)
 			{
@@ -42,7 +41,7 @@ namespace TodoList
 					continue;
 				if (input.ToLower() == "exit")
 				{
-					FileManager.SaveTodos(AppInfo.Todos, userTodosPath);
+					FileManager.SaveTodos(AppInfo.CurrentUserTodos, userTodosPath);
 					break;
 				}
 				ICommand command = CommandParser.Parse(input);
@@ -53,11 +52,11 @@ namespace TodoList
 					{
 						AppInfo.UndoStack.Push(command);
 						AppInfo.RedoStack.Clear();
-						FileManager.SaveTodos(AppInfo.Todos, userTodosPath);
+						FileManager.SaveTodos(AppInfo.CurrentUserTodos, userTodosPath);
 					}
 					else if (command is UndoCommand || command is RedoCommand)
 					{
-						FileManager.SaveTodos(AppInfo.Todos, userTodosPath);
+						FileManager.SaveTodos(AppInfo.CurrentUserTodos, userTodosPath);
 					}
 				}
 			}
@@ -73,6 +72,8 @@ namespace TodoList
 			if (foundProfile != null && foundProfile.Password == password)
 			{
 				AppInfo.CurrentProfileId = foundProfile.Id;
+				string userTodosPath = Path.Combine(DataDirectory, $"todos_{foundProfile.Id}.csv");
+				AppInfo.AllTodos[foundProfile.Id] = FileManager.LoadTodos(userTodosPath);
 				Console.WriteLine("Вход выполнен успешно!");
 			}
 			else

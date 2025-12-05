@@ -29,6 +29,14 @@ namespace TodoList
 		{
 			items.Add(item);
 		}
+		public void Remove(TodoItem item)
+		{
+			items.Remove(item);
+		}
+		public bool Contains(TodoItem item)
+		{
+			return items.Contains(item);
+		}
 		public void Insert(int index, TodoItem item)
 		{
 			int internalIndex = index - 1;

@@ -1,11 +1,11 @@
 ﻿using System;
 namespace TodoList.Commands
 {
-	internal class UpdateCommand : ICommand
+	public class UpdateCommand : ICommand
 	{
 		public int Index { get; set; }
 		public string NewText { get; set; }
-		private string _oldText;
+		private string? _oldText;
 		public UpdateCommand(int index, string newText)
 		{
 			Index = index;
@@ -13,7 +13,7 @@ namespace TodoList.Commands
 		}
 		public void Execute()
 		{
-			var item = AppInfo.Todos.GetItem(Index);
+			var item = AppInfo.CurrentUserTodos.GetItem(Index);
 			if (item != null)
 			{
 				_oldText = item.Text;
@@ -27,7 +27,7 @@ namespace TodoList.Commands
 		}
 		public void Unexecute()
 		{
-			var item = AppInfo.Todos.GetItem(Index);
+			var item = AppInfo.CurrentUserTodos.GetItem(Index);
 			if (item != null && _oldText != null)
 			{
 				item.UpdateText(_oldText);

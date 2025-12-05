@@ -1,11 +1,10 @@
 ﻿using System;
 namespace TodoList.Commands
 {
-	internal class AddCommand : ICommand
+	public class AddCommand : ICommand
 	{
 		public string TaskText { get; set; }
-		private TodoItem _addedItem;
-
+		private TodoItem? _addedItem;
 		public AddCommand(string taskText)
 		{
 			TaskText = taskText;
@@ -18,14 +17,14 @@ namespace TodoList.Commands
 				return;
 			}
 			_addedItem = new TodoItem(TaskText);
-			AppInfo.Todos.Add(_addedItem);
+			AppInfo.CurrentUserTodos.Add(_addedItem);
 			Console.WriteLine("Задача добавлена!");
 		}
 		public void Unexecute()
 		{
-			if (AppInfo.Todos.Count > 0)
+			if (_addedItem != null && AppInfo.CurrentUserTodos.Contains(_addedItem))
 			{
-				AppInfo.Todos.Delete(AppInfo.Todos.Count);
+				AppInfo.CurrentUserTodos.Remove(_addedItem);
 			}
 		}
 	}

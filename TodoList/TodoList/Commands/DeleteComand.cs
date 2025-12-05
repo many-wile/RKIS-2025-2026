@@ -1,20 +1,20 @@
 ﻿using System;
 namespace TodoList.Commands
 {
-	internal class DeleteCommand : ICommand
+	public class DeleteCommand : ICommand
 	{
 		private int _index;
-		private TodoItem _deletedItem;
+		private TodoItem? _deletedItem;
 		public DeleteCommand(int index)
 		{
 			_index = index;
 		}
 		public void Execute()
 		{
-			_deletedItem = AppInfo.Todos.GetItem(_index);
+			_deletedItem = AppInfo.CurrentUserTodos.GetItem(_index);
 			if (_deletedItem != null)
 			{
-				AppInfo.Todos.Delete(_index);
+				AppInfo.CurrentUserTodos.Delete(_index);
 				Console.WriteLine($"Задача {_index} удалена.");
 			}
 			else
@@ -26,7 +26,7 @@ namespace TodoList.Commands
 		{
 			if (_deletedItem != null)
 			{
-				AppInfo.Todos.Insert(_index, _deletedItem);
+				AppInfo.CurrentUserTodos.Insert(_index, _deletedItem);
 			}
 		}
 	}

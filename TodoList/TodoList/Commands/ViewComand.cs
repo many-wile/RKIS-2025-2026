@@ -1,7 +1,7 @@
 ﻿using System;
 namespace TodoList.Commands
 {
-	internal class ViewCommand : ICommand
+	public class ViewCommand : ICommand
 	{
 		public bool ShowIndex { get; set; }
 		public bool ShowDone { get; set; }
@@ -16,11 +16,10 @@ namespace TodoList.Commands
 			{
 				ShowIndex = ShowDone = ShowDate = true;
 			}
-			AppInfo.Todos.View(ShowIndex, ShowDone, ShowDate);
+			AppInfo.CurrentUserTodos.View(ShowIndex, ShowDone, ShowDate);
 		}
 		public void Unexecute()
 		{
-
 		}
 	}
 }

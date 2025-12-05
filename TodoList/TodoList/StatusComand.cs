@@ -1,7 +1,7 @@
 ﻿using System;
 namespace TodoList.Commands
 {
-	internal class StatusCommand : ICommand
+	public class StatusCommand : ICommand
 	{
 		private int _index;
 		private TodoStatus _newStatus;
@@ -13,11 +13,11 @@ namespace TodoList.Commands
 		}
 		public void Execute()
 		{
-			var item = AppInfo.Todos.GetItem(_index);
+			var item = AppInfo.CurrentUserTodos.GetItem(_index);
 			if (item != null)
 			{
 				_oldStatus = item.Status;
-				AppInfo.Todos.SetStatus(_index, _newStatus);
+				AppInfo.CurrentUserTodos.SetStatus(_index, _newStatus);
 				Console.WriteLine($"Статус задачи {_index} изменен на '{_newStatus}'.");
 			}
 			else
@@ -27,10 +27,10 @@ namespace TodoList.Commands
 		}
 		public void Unexecute()
 		{
-			var item = AppInfo.Todos.GetItem(_index);
+			var item = AppInfo.CurrentUserTodos.GetItem(_index);
 			if (item != null)
 			{
-				AppInfo.Todos.SetStatus(_index, _oldStatus);
+				AppInfo.CurrentUserTodos.SetStatus(_index, _oldStatus);
 			}
 		}
 	}
