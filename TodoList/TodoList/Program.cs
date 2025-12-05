@@ -19,7 +19,6 @@ namespace TodoList
 				{
 					Console.Write("\nВойти в существующий профиль? [y/n] (или 'exit' для выхода): ");
 					string choice = Console.ReadLine()?.ToLower();
-
 					if (choice == "y")
 					{
 						Login();
@@ -44,7 +43,6 @@ namespace TodoList
 				{
 					Console.Write("> ");
 					string input = Console.ReadLine()?.Trim();
-
 					if (string.IsNullOrWhiteSpace(input))
 						continue;
 					if (input.ToLower() == "exit")
@@ -57,7 +55,6 @@ namespace TodoList
 					if (command != null)
 					{
 						command.Execute();
-
 						if (command is AddCommand || command is DeleteCommand || command is UpdateCommand || command is StatusCommand)
 						{
 							AppInfo.UndoStack.Push(command);
@@ -79,6 +76,8 @@ namespace TodoList
 				AppInfo.CurrentProfileId = foundProfile.Id;
 				string userTodosPath = Path.Combine(DataDirectory, $"todos_{foundProfile.Id}.csv");
 				AppInfo.AllTodos[foundProfile.Id] = FileManager.LoadTodos(userTodosPath);
+				AppInfo.UndoStack.Clear();
+				AppInfo.RedoStack.Clear();
 				Console.WriteLine("Вход выполнен успешно!");
 			}
 			else
@@ -112,6 +111,8 @@ namespace TodoList
 			AppInfo.AllProfiles.Add(newProfile);
 			FileManager.SaveProfiles(AppInfo.AllProfiles, Path.Combine(DataDirectory, ProfilesFileName));
 			AppInfo.CurrentProfileId = newProfile.Id;
+			AppInfo.UndoStack.Clear();
+			AppInfo.RedoStack.Clear();
 			Console.WriteLine("Регистрация прошла успешно! Вы вошли в систему.");
 		}
 	}
