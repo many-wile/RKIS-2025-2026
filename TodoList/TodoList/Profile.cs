@@ -1,27 +1,40 @@
 ﻿using System;
 namespace TodoList
 {
-    internal class Profile
-    {
-        private string fullName;
-        private DateTime birthDate;
-        public Profile(string fullName, DateTime birthDate)
-        {
-            this.fullName = fullName;
-            this.birthDate = birthDate;
-        }
-        public string GetInfo()
-        {
-            int age = DateTime.Now.Year - birthDate.Year;
-            if (DateTime.Now.DayOfYear < birthDate.DayOfYear)
-                age--;
-            return $"{fullName}, возраст: {age} лет";
-        }
-        public string GetRawInfo()
-        {
-            return $"{fullName}\n{birthDate:yyyy-MM-dd}";
-        }
-        public string FullName => fullName;
-        public DateTime BirthDate => birthDate;
-    }
+	internal class Profile
+	{
+		public Guid Id { get; private set; }
+		public string Login { get; private set; }
+		public string Password { get; private set; } 
+		public string FirstName { get; private set; }
+		public string LastName { get; private set; }
+		public int BirthYear { get; private set; }
+		public Profile(string firstName, string lastName, int birthYear, string login, string password)
+		{
+			Id = Guid.NewGuid();
+			FirstName = firstName;
+			LastName = lastName;
+			BirthYear = birthYear;
+			Login = login;
+			Password = password;
+		}
+		public Profile(Guid id, string login, string password, string firstName, string lastName, int birthYear)
+		{
+			Id = id;
+			Login = login;
+			Password = password;
+			FirstName = firstName;
+			LastName = lastName;
+			BirthYear = birthYear;
+		}
+		public string GetInfo()
+		{
+			int age = DateTime.Now.Year - BirthYear;
+			return $"{FirstName} {LastName} (Login: {Login}), возраст: {age} лет";
+		}
+		public string ToCsvString()
+		{
+			return $"{Id};{Login};{Password};{FirstName};{LastName};{BirthYear}";
+		}
+	}
 }

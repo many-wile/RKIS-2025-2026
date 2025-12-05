@@ -9,56 +9,61 @@ namespace TodoList
 		{
 			if (!Directory.Exists(dirPath))
 			{
-				try
-				{
-					Directory.CreateDirectory(dirPath);
-					Console.WriteLine($"Создана папка для данных: {dirPath}");
-				}
-				catch (Exception ex)
-				{
-					Console.WriteLine($"Ошибка при создании директории '{dirPath}': {ex.Message}");
-				}
+				Directory.CreateDirectory(dirPath);
 			}
 		}
-		public static void SaveProfile(Profile profile, string filePath)
+		public static void SaveProfiles(List<Profile> profiles, string filePath)
 		{
 			try
 			{
-				File.WriteAllText(filePath, profile.GetRawInfo());
-				Console.WriteLine($"Профиль пользователя сохранен в {filePath}");
+				List<string> linesToWrite = new List<string>();
+				linesToWrite.Add("Id;Login;Password;FirstName;LastName;BirthYear");
+				foreach (var profile in profiles)
+				{
+					linesToWrite.Add(profile.ToCsvString());
+				}
+				File.WriteAllLines(filePath, linesToWrite);
 			}
 			catch (Exception ex)
 			{
-				Console.WriteLine($"Ошибка при сохранении профиля в '{filePath}': {ex.Message}");
+				Console.WriteLine($"Ошибка при сохранении профилей в '{filePath}': {ex.Message}");
 			}
 		}
-		public static Profile LoadProfile(string filePath)
+		public static List<Profile> LoadProfiles(string filePath)
 		{
+			var profiles = new List<Profile>();
 			if (!File.Exists(filePath))
 			{
-				Console.WriteLine($"Файл профиля не найден: {filePath}. Будет создан новый профиль при первом вводе данных.");
-				return null;
+				return profiles;
 			}
 			try
 			{
 				string[] lines = File.ReadAllLines(filePath);
-				if (lines.Length == 2)
+				if (lines.Length <= 1)
 				{
-					string fullName = lines[0];
-					if (DateTime.TryParse(lines[1], out DateTime birthDate))
+					return profiles;
+				}
+				for (int i = 1; i < lines.Length; i++)
+				{
+					string[] parts = lines[i].Split(';');
+					if (parts.Length == 6)
 					{
-						Console.WriteLine($"Профиль пользователя успешно загружен из {filePath}");
-						return new Profile(fullName, birthDate);
+						if (Guid.TryParse(parts[0], out Guid id) && int.TryParse(parts[5], out int birthYear))
+						{
+							string login = parts[1];
+							string password = parts[2];
+							string firstName = parts[3];
+							string lastName = parts[4];
+							profiles.Add(new Profile(id, login, password, firstName, lastName, birthYear));
+						}
 					}
 				}
-				Console.WriteLine($"Неверный формат данных в файле профиля: {filePath}. Пожалуйста, создайте профиль заново.");
-				return null;
 			}
 			catch (Exception ex)
 			{
-				Console.WriteLine($"Ошибка при загрузке профиля из '{filePath}': {ex.Message}. Пожалуйста, создайте профиль заново.");
-				return null;
+				Console.WriteLine($"Ошибка при загрузке профилей из '{filePath}': {ex.Message}");
 			}
+			return profiles;
 		}
 		public static void SaveTodos(TodoList todos, string filePath)
 		{
@@ -66,24 +71,20 @@ namespace TodoList
 			{
 				List<string> linesToWrite = new List<string>();
 				linesToWrite.Add("Index;Text;Status;LastUpdate");
-
 				for (int i = 0; i < todos.Count; i++)
 				{
 					TodoItem item = todos[i];
 					if (item != null)
 					{
-						string processedText = item.Text.Replace("\n", "\\n");
-						processedText = processedText.Replace("\"", "\"\"");
-						if (processedText.Contains(";") || processedText.Contains("\\n"))
+						string processedText = item.Text.Replace("\n", "\\n").Replace("\"", "\"\"");
+						if (processedText.Contains(";"))
 						{
 							processedText = $"\"{processedText}\"";
 						}
-
 						linesToWrite.Add($"{i};{processedText};{item.Status.ToString()};{item.LastUpdate:o}");
 					}
 				}
 				File.WriteAllLines(filePath, linesToWrite);
-				Console.WriteLine($"Задачи успешно сохранены в {filePath}");
 			}
 			catch (Exception ex)
 			{
@@ -95,7 +96,6 @@ namespace TodoList
 			TodoList todos = new TodoList();
 			if (!File.Exists(filePath))
 			{
-				Console.WriteLine($"Файл задач не найден: {filePath}. Будет создан пустой список задач.");
 				return todos;
 			}
 			try
@@ -103,42 +103,26 @@ namespace TodoList
 				string[] lines = File.ReadAllLines(filePath);
 				if (lines.Length <= 1)
 				{
-					Console.WriteLine($"Файл задач пуст или содержит только заголовок: {filePath}.");
 					return todos;
 				}
 				for (int i = 1; i < lines.Length; i++)
 				{
-					string line = lines[i];
-					List<string> parts = ParseCsvLine(line, ';');
+					List<string> parts = ParseCsvLine(lines[i], ';');
 					if (parts.Count == 4)
 					{
-						string text = parts[1];
-						string statusString = parts[2];
-						string lastUpdateString = parts[3];
-						if (Enum.TryParse<TodoStatus>(statusString, true, out TodoStatus status) && DateTime.TryParse(lastUpdateString, out DateTime lastUpdate))
+						string text = parts[1].Replace("\\n", "\n");
+						if (Enum.TryParse<TodoStatus>(parts[2], true, out TodoStatus status) && DateTime.TryParse(parts[3], out DateTime lastUpdate))
 						{
-							text = text.Replace("\\n", "\n");
-							TodoItem item = new TodoItem(text, status, lastUpdate);
-							todos.Add(item);
+							todos.Add(new TodoItem(text, status, lastUpdate));
 						}
-						else
-						{
-							Console.WriteLine($"Предупреждение: Неверный формат Status или DateTime в строке: {line}");
-						}
-					}
-					else
-					{
-						Console.WriteLine($"Предупреждение: Неверное количество полей ({parts.Count}) в строке: {line}");
 					}
 				}
-				Console.WriteLine($"Задачи успешно загружены из {filePath}");
-				return todos;
 			}
 			catch (Exception ex)
 			{
-				Console.WriteLine($"Ошибка при загрузке задач из '{filePath}': {ex.Message}. Будет создан пустой список задач.");
-				return new TodoList();
+				Console.WriteLine($"Ошибка при загрузке задач из '{filePath}': {ex.Message}");
 			}
+			return todos;
 		}
 		private static List<string> ParseCsvLine(string line, char separator)
 		{
