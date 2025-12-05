@@ -1,6 +1,7 @@
 ﻿using TodoList.Commands;
 using System;
 using System.IO;
+using System.Linq; 
 namespace TodoList
 {
 	internal class Program
@@ -11,7 +12,7 @@ namespace TodoList
 		{
 			Console.WriteLine("Работу выполнили Нестеренко и Горелов");
 			FileManager.EnsureDataDirectory(DataDirectory);
-			ProfileManager.LoadProfiles(Path.Combine(DataDirectory, ProfilesFileName));
+			AppInfo.AllProfiles = FileManager.LoadProfiles(Path.Combine(DataDirectory, ProfilesFileName));
 			while (AppInfo.CurrentProfile == null)
 			{
 				Console.WriteLine("\n1 - Войти");
@@ -41,6 +42,7 @@ namespace TodoList
 			{
 				Console.Write("> ");
 				string input = Console.ReadLine()?.Trim();
+
 				if (string.IsNullOrWhiteSpace(input))
 					continue;
 				if (input.ToLower() == "exit")
@@ -72,10 +74,11 @@ namespace TodoList
 			string login = Console.ReadLine();
 			Console.Write("Пароль: ");
 			string password = Console.ReadLine();
-			Profile foundProfile = ProfileManager.FindByLogin(login);
+			Profile foundProfile = AppInfo.AllProfiles.FirstOrDefault(p => p.Login.Equals(login, StringComparison.OrdinalIgnoreCase));
+
 			if (foundProfile != null && foundProfile.Password == password)
 			{
-				AppInfo.CurrentProfile = foundProfile;
+				AppInfo.CurrentProfileId = foundProfile.Id;
 				Console.WriteLine("Вход выполнен успешно!");
 			}
 			else
@@ -97,7 +100,7 @@ namespace TodoList
 			}
 			Console.Write("Логин: ");
 			string login = Console.ReadLine();
-			if (ProfileManager.FindByLogin(login) != null)
+			if (AppInfo.AllProfiles.Any(p => p.Login.Equals(login, StringComparison.OrdinalIgnoreCase)))
 			{
 				Console.WriteLine("Пользователь с таким логином уже существует.");
 				return;
@@ -105,9 +108,9 @@ namespace TodoList
 			Console.Write("Пароль: ");
 			string password = Console.ReadLine();
 			var newProfile = new Profile(firstName, lastName, birthYear, login, password);
-			ProfileManager.AddProfile(newProfile);
-			ProfileManager.SaveProfiles(Path.Combine(DataDirectory, ProfilesFileName));
-			AppInfo.CurrentProfile = newProfile;
+			AppInfo.AllProfiles.Add(newProfile);
+			FileManager.SaveProfiles(AppInfo.AllProfiles, Path.Combine(DataDirectory, ProfilesFileName));
+			AppInfo.CurrentProfileId = newProfile.Id;
 			Console.WriteLine("Регистрация прошла успешно! Вы вошли в систему.");
 		}
 	}
