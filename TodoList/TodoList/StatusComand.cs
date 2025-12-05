@@ -19,6 +19,7 @@ namespace TodoList.Commands
 				_oldStatus = item.Status;
 				AppInfo.CurrentUserTodos.SetStatus(_index, _newStatus);
 				Console.WriteLine($"Статус задачи {_index} изменен на '{_newStatus}'.");
+				FileManager.SaveTodos(AppInfo.CurrentUserTodos, AppInfo.CurrentUserTodosPath);
 			}
 			else
 			{
@@ -31,6 +32,7 @@ namespace TodoList.Commands
 			if (item != null)
 			{
 				AppInfo.CurrentUserTodos.SetStatus(_index, _oldStatus);
+				FileManager.SaveTodos(AppInfo.CurrentUserTodos, AppInfo.CurrentUserTodosPath);
 			}
 		}
 	}

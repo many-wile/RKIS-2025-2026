@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using TodoList.Commands;
@@ -31,7 +30,6 @@ namespace TodoList
 					Console.WriteLine("Неверный ввод. Пожалуйста, введите 'y' или 'n'.");
 				}
 			}
-			string userTodosPath = Path.Combine(DataDirectory, $"todos_{AppInfo.CurrentProfile.Id}.csv");
 			Console.WriteLine($"\nДобро пожаловать, {AppInfo.CurrentProfile.FirstName}! Введите команду (help — для списка команд):");
 			while (true)
 			{
@@ -41,7 +39,7 @@ namespace TodoList
 					continue;
 				if (input.ToLower() == "exit")
 				{
-					FileManager.SaveTodos(AppInfo.CurrentUserTodos, userTodosPath);
+					FileManager.SaveTodos(AppInfo.CurrentUserTodos, AppInfo.CurrentUserTodosPath);
 					break;
 				}
 				ICommand command = CommandParser.Parse(input);
@@ -52,11 +50,6 @@ namespace TodoList
 					{
 						AppInfo.UndoStack.Push(command);
 						AppInfo.RedoStack.Clear();
-						FileManager.SaveTodos(AppInfo.CurrentUserTodos, userTodosPath);
-					}
-					else if (command is UndoCommand || command is RedoCommand)
-					{
-						FileManager.SaveTodos(AppInfo.CurrentUserTodos, userTodosPath);
 					}
 				}
 			}
@@ -106,6 +99,7 @@ namespace TodoList
 			var newProfile = new Profile(firstName, lastName, birthYear, login, password);
 			AppInfo.AllProfiles.Add(newProfile);
 			FileManager.SaveProfiles(AppInfo.AllProfiles, Path.Combine(DataDirectory, ProfilesFileName));
+
 			AppInfo.CurrentProfileId = newProfile.Id;
 			Console.WriteLine("Регистрация прошла успешно! Вы вошли в систему.");
 		}

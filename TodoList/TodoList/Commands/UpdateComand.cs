@@ -19,6 +19,7 @@ namespace TodoList.Commands
 				_oldText = item.Text;
 				item.UpdateText(NewText);
 				Console.WriteLine($"Задача {Index} обновлена.");
+				FileManager.SaveTodos(AppInfo.CurrentUserTodos, AppInfo.CurrentUserTodosPath);
 			}
 			else
 			{
@@ -31,6 +32,7 @@ namespace TodoList.Commands
 			if (item != null && _oldText != null)
 			{
 				item.UpdateText(_oldText);
+				FileManager.SaveTodos(AppInfo.CurrentUserTodos, AppInfo.CurrentUserTodosPath);
 			}
 		}
 	}
