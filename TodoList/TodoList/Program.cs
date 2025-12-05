@@ -13,47 +13,59 @@ namespace TodoList
 			Console.WriteLine("Работу выполнили Нестеренко и Горелов");
 			FileManager.EnsureDataDirectory(DataDirectory);
 			AppInfo.AllProfiles = FileManager.LoadProfiles(Path.Combine(DataDirectory, ProfilesFileName));
-			while (AppInfo.CurrentProfile == null)
-			{
-				Console.Write("\nВойти в существующий профиль? [y/n]: ");
-				string choice = Console.ReadLine()?.ToLower();
-				if (choice == "y")
-				{
-					Login();
-				}
-				else if (choice == "n")
-				{
-					Register();
-				}
-				else
-				{
-					Console.WriteLine("Неверный ввод. Пожалуйста, введите 'y' или 'n'.");
-				}
-			}
-			Console.WriteLine($"\nДобро пожаловать, {AppInfo.CurrentProfile.FirstName}! Введите команду (help — для списка команд):");
 			while (true)
 			{
-				Console.Write("> ");
-				string input = Console.ReadLine()?.Trim();
-				if (string.IsNullOrWhiteSpace(input))
-					continue;
-				if (input.ToLower() == "exit")
+				while (AppInfo.CurrentProfile == null)
 				{
-					FileManager.SaveTodos(AppInfo.CurrentUserTodos, AppInfo.CurrentUserTodosPath);
-					break;
-				}
-				ICommand command = CommandParser.Parse(input);
-				if (command != null)
-				{
-					command.Execute();
-					if (command is AddCommand || command is DeleteCommand || command is UpdateCommand || command is StatusCommand)
+					Console.Write("\nВойти в существующий профиль? [y/n] (или 'exit' для выхода): ");
+					string choice = Console.ReadLine()?.ToLower();
+
+					if (choice == "y")
 					{
-						AppInfo.UndoStack.Push(command);
-						AppInfo.RedoStack.Clear();
+						Login();
+					}
+					else if (choice == "n")
+					{
+						Register();
+					}
+					else if (choice == "exit")
+					{
+						Console.WriteLine("Программа завершена.");
+						return;
+					}
+					else
+					{
+						Console.WriteLine("Неверный ввод. Пожалуйста, введите 'y' или 'n'.");
+					}
+				}
+				string userTodosPath = Path.Combine(DataDirectory, $"todos_{AppInfo.CurrentProfile.Id}.csv");
+				Console.WriteLine($"\nДобро пожаловать, {AppInfo.CurrentProfile.FirstName}! Введите команду (help — для списка команд):");
+				while (AppInfo.CurrentProfile != null)
+				{
+					Console.Write("> ");
+					string input = Console.ReadLine()?.Trim();
+
+					if (string.IsNullOrWhiteSpace(input))
+						continue;
+					if (input.ToLower() == "exit")
+					{
+						FileManager.SaveTodos(AppInfo.CurrentUserTodos, userTodosPath);
+						Console.WriteLine("Программа завершена.");
+						return;
+					}
+					ICommand command = CommandParser.Parse(input);
+					if (command != null)
+					{
+						command.Execute();
+
+						if (command is AddCommand || command is DeleteCommand || command is UpdateCommand || command is StatusCommand)
+						{
+							AppInfo.UndoStack.Push(command);
+							AppInfo.RedoStack.Clear();
+						}
 					}
 				}
 			}
-			Console.WriteLine("Программа завершена.");
 		}
 		static void Login()
 		{
@@ -99,7 +111,6 @@ namespace TodoList
 			var newProfile = new Profile(firstName, lastName, birthYear, login, password);
 			AppInfo.AllProfiles.Add(newProfile);
 			FileManager.SaveProfiles(AppInfo.AllProfiles, Path.Combine(DataDirectory, ProfilesFileName));
-
 			AppInfo.CurrentProfileId = newProfile.Id;
 			Console.WriteLine("Регистрация прошла успешно! Вы вошли в систему.");
 		}

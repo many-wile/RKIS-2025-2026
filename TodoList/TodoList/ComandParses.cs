@@ -2,25 +2,17 @@
 using TodoList.Commands;
 namespace TodoList
 {
-	static class CommandParser
+	public static class CommandParser
 	{
 		public static ICommand Parse(string inputString)
 		{
 			if (string.IsNullOrWhiteSpace(inputString))
 				return null;
 			inputString = inputString.Trim();
-			string commandName = inputString.Split(' ')[0].ToLower();
-			if (commandName == "help")
+			if (inputString == "help")
 			{
-				return new CommandHelp();
-			}
-			if (commandName == "undo")
-			{
-				return new UndoCommand();
-			}
-			if (commandName == "redo")
-			{
-				return new RedoCommand();
+				ShowHelp();
+				return null;
 			}
 			if (inputString.StartsWith("add -m") || inputString.StartsWith("add --multiline"))
 			{
@@ -37,15 +29,12 @@ namespace TodoList
 				}
 				return new AddCommand(text);
 			}
-			if (commandName == "add")
+			if (inputString.StartsWith("add "))
 			{
-				if (inputString.Length > 4)
-				{
-					string text = inputString.Substring(4).Trim();
-					return new AddCommand(text);
-				}
+				string text = inputString.Substring(4).Trim();
+				return new AddCommand(text);
 			}
-			if (commandName == "status")
+			if (inputString.StartsWith("status "))
 			{
 				string[] parts = inputString.Split(' ', 3, StringSplitOptions.RemoveEmptyEntries);
 				if (parts.Length == 3 && int.TryParse(parts[1], out int idx))
@@ -62,18 +51,18 @@ namespace TodoList
 					}
 				}
 			}
-			if (commandName == "update")
+			if (inputString.StartsWith("update "))
 			{
 				string[] parts = inputString.Split(' ', 3);
 				if (parts.Length == 3 && int.TryParse(parts[1], out int idx))
 					return new UpdateCommand(idx, parts[2]);
 			}
-			if (commandName == "delete")
+			if (inputString.StartsWith("delete "))
 			{
 				if (int.TryParse(inputString.Substring(7), out int idx))
 					return new DeleteCommand(idx);
 			}
-			if (commandName == "view")
+			if (inputString.StartsWith("view"))
 			{
 				ViewCommand command = new ViewCommand();
 				string[] parts = inputString.Split(' ', StringSplitOptions.RemoveEmptyEntries);
@@ -93,11 +82,56 @@ namespace TodoList
 				}
 				return command;
 			}
-			if (commandName == "profile")
+			if (inputString.StartsWith("profile"))
 			{
+				string[] parts = inputString.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+				if (parts.Length > 1 && (parts[1] == "-o" || parts[1] == "--out"))
+				{
+					if (AppInfo.CurrentProfile != null)
+					{
+						Console.WriteLine($"Пользователь {AppInfo.CurrentProfile.Login} вышел из системы.");
+						AppInfo.CurrentProfileId = null;
+					}
+					return null;
+				}
 				return new ProfileCommand();
 			}
+			if (inputString == "undo")
+			{
+				return new UndoCommand();
+			}
+			if (inputString == "redo")
+			{
+				return new RedoCommand();
+			}
 			return null;
+		}
+		private static void ShowHelp()
+		{
+			Console.WriteLine(@"
+Доступные команды:
+add <текст>          - добавить задачу
+add -m / --multiline - многострочный ввод (!end - завершить)
+status <номер> <статус> - изменить статус задачи
+update <номер> <текст> - изменить текст задачи
+delete <номер>       - удалить задачу
+view [флаги]         - показать задачи
+profile              - показать профиль пользователя
+profile -o / --out   - выйти из текущего профиля
+help                 - показать список команд
+undo                 - отменить последнее действие
+redo                 - повторить отмененное действие
+exit                 - выход
+
+Доступные статусы для команды status:
+NotStarted, InProgress, Completed, Postponed, Failed
+
+Флаги для view:
+-i, --index          - показывать индекс задачи
+-s, --status         - показывать статус
+-d, --update-date    - показывать дату изменения
+-a, --all            - показывать всё
+");
 		}
 	}
 }
