@@ -3,10 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 namespace TodoList
 {
-	internal class TodoList : IEnumerable<TodoItem>
+	public class TodoList : IEnumerable<TodoItem>
 	{
 		private List<TodoItem> items;
-
 		public TodoList()
 		{
 			items = new List<TodoItem>();

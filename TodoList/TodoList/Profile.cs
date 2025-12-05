@@ -1,11 +1,11 @@
 ﻿using System;
 namespace TodoList
 {
-	internal class Profile
+	public class Profile
 	{
 		public Guid Id { get; private set; }
 		public string Login { get; private set; }
-		public string Password { get; private set; } 
+		public string Password { get; private set; }
 		public string FirstName { get; private set; }
 		public string LastName { get; private set; }
 		public int BirthYear { get; private set; }

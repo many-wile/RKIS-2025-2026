@@ -1,7 +1,7 @@
 ﻿using System;
 namespace TodoList
 {
-	internal class TodoItem
+	public class TodoItem
 	{
 		private string text;
 		public TodoStatus Status { get; private set; }

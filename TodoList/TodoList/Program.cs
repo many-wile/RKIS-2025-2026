@@ -1,7 +1,8 @@
 ﻿using TodoList.Commands;
 using System;
+using System.Globalization;
 using System.IO;
-using System.Linq; 
+using System.Linq;
 namespace TodoList
 {
 	internal class Program
@@ -15,24 +16,19 @@ namespace TodoList
 			AppInfo.AllProfiles = FileManager.LoadProfiles(Path.Combine(DataDirectory, ProfilesFileName));
 			while (AppInfo.CurrentProfile == null)
 			{
-				Console.WriteLine("\n1 - Войти");
-				Console.WriteLine("2 - Зарегистрироваться");
-				Console.WriteLine("exit - Выход");
-				Console.Write("> ");
-				string choice = Console.ReadLine();
-				switch (choice)
+				Console.Write("\nВойти в существующий профиль? [y/n]: ");
+				string choice = Console.ReadLine()?.ToLower();
+				if (choice == "y")
 				{
-					case "1":
-						Login();
-						break;
-					case "2":
-						Register();
-						break;
-					case "exit":
-						return;
-					default:
-						Console.WriteLine("Неверный выбор.");
-						break;
+					Login();
+				}
+				else if (choice == "n")
+				{
+					Register();
+				}
+				else
+				{
+					Console.WriteLine("Неверный ввод. Пожалуйста, введите 'y' или 'n'.");
 				}
 			}
 			string userTodosPath = Path.Combine(DataDirectory, $"todos_{AppInfo.CurrentProfile.Login}.csv");
@@ -42,7 +38,6 @@ namespace TodoList
 			{
 				Console.Write("> ");
 				string input = Console.ReadLine()?.Trim();
-
 				if (string.IsNullOrWhiteSpace(input))
 					continue;
 				if (input.ToLower() == "exit")
@@ -70,12 +65,11 @@ namespace TodoList
 		}
 		static void Login()
 		{
-			Console.Write("Логин: ");
+			Console.Write("Введите логин: ");
 			string login = Console.ReadLine();
-			Console.Write("Пароль: ");
+			Console.Write("Введите пароль: ");
 			string password = Console.ReadLine();
 			Profile foundProfile = AppInfo.AllProfiles.FirstOrDefault(p => p.Login.Equals(login, StringComparison.OrdinalIgnoreCase));
-
 			if (foundProfile != null && foundProfile.Password == password)
 			{
 				AppInfo.CurrentProfileId = foundProfile.Id;
@@ -88,24 +82,25 @@ namespace TodoList
 		}
 		static void Register()
 		{
-			Console.Write("Имя: ");
+			Console.WriteLine("\n--- Создание нового профиля ---");
+			Console.Write("Введите имя: ");
 			string firstName = Console.ReadLine();
-			Console.Write("Фамилия: ");
+			Console.Write("Введите фамилию: ");
 			string lastName = Console.ReadLine();
-			Console.Write("Год рождения: ");
+			Console.Write("Введите год рождения: ");
 			if (!int.TryParse(Console.ReadLine(), out int birthYear) || birthYear < 1900 || birthYear > DateTime.Now.Year)
 			{
-				Console.WriteLine("Некорректный год рождения.");
+				Console.WriteLine("Некорректный год рождения. Регистрация отменена.");
 				return;
 			}
-			Console.Write("Логин: ");
+			Console.Write("Введите логин: ");
 			string login = Console.ReadLine();
 			if (AppInfo.AllProfiles.Any(p => p.Login.Equals(login, StringComparison.OrdinalIgnoreCase)))
 			{
-				Console.WriteLine("Пользователь с таким логином уже существует.");
+				Console.WriteLine("Пользователь с таким логином уже существует. Регистрация отменена.");
 				return;
 			}
-			Console.Write("Пароль: ");
+			Console.Write("Введите пароль: ");
 			string password = Console.ReadLine();
 			var newProfile = new Profile(firstName, lastName, birthYear, login, password);
 			AppInfo.AllProfiles.Add(newProfile);

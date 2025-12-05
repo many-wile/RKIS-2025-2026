@@ -8,6 +8,7 @@ namespace TodoList
 	{
 		public static List<Profile> AllProfiles { get; set; } = new List<Profile>();
 		public static Guid? CurrentProfileId { get; set; }
+		public static TodoList Todos { get; set; }
 		public static Profile CurrentProfile
 		{
 			get

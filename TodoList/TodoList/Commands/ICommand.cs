@@ -1,6 +1,6 @@
 ﻿namespace TodoList.Commands
 {
-	internal interface ICommand
+	public interface ICommand
 	{
 		void Execute();
 		void Unexecute();
