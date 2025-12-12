@@ -6,6 +6,11 @@ namespace TodoList
 	public class TodoList : IEnumerable<TodoItem>
 	{
 		private List<TodoItem> items;
+
+		public event Action<TodoItem>? OnTodoAdded;
+		public event Action<TodoItem>? OnTodoDeleted;
+		public event Action<TodoItem>? OnTodoUpdated;
+		public event Action<TodoItem>? OnStatusChanged;
 		public TodoList()
 		{
 			items = new List<TodoItem>();
@@ -28,10 +33,15 @@ namespace TodoList
 		public void Add(TodoItem item)
 		{
 			items.Add(item);
+			OnTodoAdded?.Invoke(item);
 		}
 		public void Remove(TodoItem item)
 		{
-			items.Remove(item);
+			if (items.Contains(item))
+			{
+				items.Remove(item);
+				OnTodoDeleted?.Invoke(item);
+			}
 		}
 		public bool Contains(TodoItem item)
 		{
@@ -44,6 +54,7 @@ namespace TodoList
 			if (internalIndex > items.Count) internalIndex = items.Count;
 
 			items.Insert(internalIndex, item);
+			OnTodoAdded?.Invoke(item);
 		}
 		public void Delete(int index)
 		{
@@ -53,7 +64,9 @@ namespace TodoList
 				Console.WriteLine("Задачи с таким номером нет.");
 				return;
 			}
+			TodoItem item = items[internalIndex];
 			items.RemoveAt(internalIndex);
+			OnTodoDeleted?.Invoke(item);
 		}
 		public TodoItem GetItem(int index)
 		{
@@ -70,6 +83,20 @@ namespace TodoList
 			if (item != null)
 			{
 				item.ChangeStatus(newStatus);
+				OnStatusChanged?.Invoke(item);
+			}
+			else
+			{
+				Console.WriteLine("Задача с таким номером не найдена.");
+			}
+		}
+		public void UpdateTaskText(int index, string newText)
+		{
+			var item = GetItem(index);
+			if (item != null)
+			{
+				item.UpdateText(newText);
+				OnTodoUpdated?.Invoke(item);
 			}
 			else
 			{
