@@ -6,7 +6,6 @@ namespace TodoList
 	public class TodoList : IEnumerable<TodoItem>
 	{
 		private List<TodoItem> items;
-
 		public event Action<TodoItem>? OnTodoAdded;
 		public event Action<TodoItem>? OnTodoDeleted;
 		public event Action<TodoItem>? OnTodoUpdated;
@@ -52,7 +51,6 @@ namespace TodoList
 			int internalIndex = index - 1;
 			if (internalIndex < 0) internalIndex = 0;
 			if (internalIndex > items.Count) internalIndex = items.Count;
-
 			items.Insert(internalIndex, item);
 			OnTodoAdded?.Invoke(item);
 		}
