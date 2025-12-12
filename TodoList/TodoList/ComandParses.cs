@@ -1,20 +1,42 @@
 ﻿using System;
+using System.Collections.Generic;
 using TodoList.Commands;
 namespace TodoList
 {
 	public static class CommandParser
 	{
+		private static Dictionary<string, Func<string, ICommand>> _commandHandlers = new Dictionary<string, Func<string, ICommand>>();
+		static CommandParser()
+		{
+			_commandHandlers["add"] = ParseAdd;
+			_commandHandlers["delete"] = ParseDelete;
+			_commandHandlers["update"] = ParseUpdate;
+			_commandHandlers["status"] = ParseStatus;
+			_commandHandlers["view"] = ParseView;
+			_commandHandlers["profile"] = ParseProfile;
+			_commandHandlers["help"] = ParseHelp;
+			_commandHandlers["undo"] = (args) => new UndoCommand();
+			_commandHandlers["redo"] = (args) => new RedoCommand();
+		}
 		public static ICommand Parse(string inputString)
 		{
 			if (string.IsNullOrWhiteSpace(inputString))
 				return null;
 			inputString = inputString.Trim();
-			if (inputString == "help")
+			string[] split = inputString.Split(new char[] { ' ' }, 2);
+			string commandName = split[0].ToLower();
+			string args = split.Length > 1 ? split[1] : "";
+
+			if (_commandHandlers.ContainsKey(commandName))
 			{
-				ShowHelp();
-				return null;
+				return _commandHandlers[commandName](args);
 			}
-			if (inputString.StartsWith("add -m") || inputString.StartsWith("add --multiline"))
+
+			return null;
+		}
+		private static ICommand ParseAdd(string args)
+		{
+			if (args.StartsWith("-m") || args.StartsWith("--multiline"))
 			{
 				Console.WriteLine("Введите задачу построчно. Для завершения '!end':");
 				string text = "";
@@ -29,74 +51,64 @@ namespace TodoList
 				}
 				return new AddCommand(text);
 			}
-			if (inputString.StartsWith("add "))
+			return new AddCommand(args.Trim());
+		}
+		private static ICommand ParseDelete(string args)
+		{
+			if (int.TryParse(args, out int idx))
+				return new DeleteCommand(idx);
+			return null;
+		}
+		private static ICommand ParseUpdate(string args)
+		{
+			string[] parts = args.Split(' ', 2);
+			if (parts.Length == 2 && int.TryParse(parts[0], out int idx))
+				return new UpdateCommand(idx, parts[1]);
+			return null;
+		}
+		private static ICommand ParseStatus(string args)
+		{
+			string[] parts = args.Split(' ', 2, StringSplitOptions.RemoveEmptyEntries);
+			if (parts.Length == 2 && int.TryParse(parts[0], out int idx))
 			{
-				string text = inputString.Substring(4).Trim();
-				return new AddCommand(text);
-			}
-			if (inputString.StartsWith("status "))
-			{
-				string[] parts = inputString.Split(' ', 3, StringSplitOptions.RemoveEmptyEntries);
-				if (parts.Length == 3 && int.TryParse(parts[1], out int idx))
+				if (Enum.TryParse<TodoStatus>(parts[1], true, out TodoStatus newStatus))
 				{
-					if (Enum.TryParse<TodoStatus>(parts[2], true, out TodoStatus newStatus))
-					{
-						return new StatusCommand(idx, newStatus);
-					}
-					else
-					{
-						Console.WriteLine($"Неизвестный статус: '{parts[2]}'.");
-						Console.WriteLine("Доступные статусы: NotStarted, InProgress, Completed, Postponed, Failed.");
-						return null;
-					}
+					return new StatusCommand(idx, newStatus);
 				}
-			}
-			if (inputString.StartsWith("update "))
-			{
-				string[] parts = inputString.Split(' ', 3);
-				if (parts.Length == 3 && int.TryParse(parts[1], out int idx))
-					return new UpdateCommand(idx, parts[2]);
-			}
-			if (inputString.StartsWith("delete "))
-			{
-				if (int.TryParse(inputString.Substring(7), out int idx))
-					return new DeleteCommand(idx);
-			}
-			if (inputString.StartsWith("view"))
-			{
-				ViewCommand command = new ViewCommand();
-				string[] parts = inputString.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-				for (int i = 1; i < parts.Length; i++)
+				else
 				{
-					switch (parts[i])
-					{
-						case "-i":
-						case "--index": command.ShowIndex = true; break;
-						case "-s":
-						case "--status": command.ShowDone = true; break;
-						case "-d":
-						case "--update-date": command.ShowDate = true; break;
-						case "-a":
-						case "--all": command.ShowAll = true; break;
-					}
+					Console.WriteLine($"Неизвестный статус: '{parts[1]}'.");
+					Console.WriteLine("Доступные статусы: NotStarted, InProgress, Completed, Postponed, Failed.");
+					return null;
 				}
-				return command;
-			}
-			if (inputString.StartsWith("profile"))
-			{
-				return new ProfileCommand(inputString);
-			}
-			if (inputString == "undo")
-			{
-				return new UndoCommand();
-			}
-			if (inputString == "redo")
-			{
-				return new RedoCommand();
 			}
 			return null;
 		}
-		private static void ShowHelp()
+		private static ICommand ParseView(string args)
+		{
+			ViewCommand command = new ViewCommand();
+			string[] parts = args.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+			foreach (var part in parts)
+			{
+				switch (part)
+				{
+					case "-i":
+					case "--index": command.ShowIndex = true; break;
+					case "-s":
+					case "--status": command.ShowDone = true; break;
+					case "-d":
+					case "--update-date": command.ShowDate = true; break;
+					case "-a":
+					case "--all": command.ShowAll = true; break;
+				}
+			}
+			return command;
+		}
+		private static ICommand ParseProfile(string args)
+		{
+			return new ProfileCommand("profile " + args);
+		}
+		private static ICommand ParseHelp(string args)
 		{
 			Console.WriteLine(@"
 Доступные команды:
@@ -122,6 +134,7 @@ NotStarted, InProgress, Completed, Postponed, Failed
 -d, --update-date    - показывать дату изменения
 -a, --all            - показывать всё
 ");
+			return null;
 		}
 	}
 }
