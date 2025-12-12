@@ -84,17 +84,7 @@ namespace TodoList
 			}
 			if (inputString.StartsWith("profile"))
 			{
-				string[] parts = inputString.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-				if (parts.Length > 1 && (parts[1] == "-o" || parts[1] == "--out"))
-				{
-					if (AppInfo.CurrentProfile != null)
-					{
-						Console.WriteLine($"Пользователь {AppInfo.CurrentProfile.Login} вышел из системы.");
-						AppInfo.CurrentProfileId = null;
-					}
-					return null;
-				}
-				return new ProfileCommand();
+				return new ProfileCommand(inputString);
 			}
 			if (inputString == "undo")
 			{
