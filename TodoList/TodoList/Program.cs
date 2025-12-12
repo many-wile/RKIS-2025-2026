@@ -80,6 +80,7 @@ namespace TodoList
 				todos.OnTodoDeleted += saveHandler;
 				todos.OnTodoUpdated += saveHandler;
 				todos.OnStatusChanged += saveHandler;
+
 				AppInfo.AllTodos[foundProfile.Id] = todos;
 				AppInfo.UndoStack.Clear();
 				AppInfo.RedoStack.Clear();
