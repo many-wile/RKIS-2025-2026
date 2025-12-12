@@ -5,7 +5,6 @@ namespace TodoList.Commands
 	{
 		public string TaskText { get; set; }
 		private TodoItem? _addedItem;
-
 		public AddCommand(string taskText)
 		{
 			TaskText = taskText;
@@ -20,14 +19,12 @@ namespace TodoList.Commands
 			_addedItem = new TodoItem(TaskText);
 			AppInfo.CurrentUserTodos.Add(_addedItem);
 			Console.WriteLine("Задача добавлена!");
-			FileManager.SaveTodos(AppInfo.CurrentUserTodos, AppInfo.CurrentUserTodosPath);
 		}
 		public void Unexecute()
 		{
 			if (_addedItem != null && AppInfo.CurrentUserTodos.Contains(_addedItem))
 			{
 				AppInfo.CurrentUserTodos.Remove(_addedItem);
-				FileManager.SaveTodos(AppInfo.CurrentUserTodos, AppInfo.CurrentUserTodosPath);
 			}
 		}
 	}

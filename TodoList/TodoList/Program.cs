@@ -47,7 +47,6 @@ namespace TodoList
 						continue;
 					if (input.ToLower() == "exit")
 					{
-						FileManager.SaveTodos(AppInfo.CurrentUserTodos, userTodosPath);
 						Console.WriteLine("Программа завершена.");
 						return;
 					}
@@ -75,7 +74,13 @@ namespace TodoList
 			{
 				AppInfo.CurrentProfileId = foundProfile.Id;
 				string userTodosPath = Path.Combine(DataDirectory, $"todos_{foundProfile.Id}.csv");
-				AppInfo.AllTodos[foundProfile.Id] = FileManager.LoadTodos(userTodosPath);
+				TodoList todos = FileManager.LoadTodos(userTodosPath);
+				Action<TodoItem> saveHandler = (item) => FileManager.SaveTodos(todos, userTodosPath);
+				todos.OnTodoAdded += saveHandler;
+				todos.OnTodoDeleted += saveHandler;
+				todos.OnTodoUpdated += saveHandler;
+				todos.OnStatusChanged += saveHandler;
+				AppInfo.AllTodos[foundProfile.Id] = todos;
 				AppInfo.UndoStack.Clear();
 				AppInfo.RedoStack.Clear();
 				Console.WriteLine("Вход выполнен успешно!");
@@ -111,6 +116,14 @@ namespace TodoList
 			AppInfo.AllProfiles.Add(newProfile);
 			FileManager.SaveProfiles(AppInfo.AllProfiles, Path.Combine(DataDirectory, ProfilesFileName));
 			AppInfo.CurrentProfileId = newProfile.Id;
+			TodoList newTodos = new TodoList();
+			string userTodosPath = Path.Combine(DataDirectory, $"todos_{newProfile.Id}.csv");
+			Action<TodoItem> saveHandler = (item) => FileManager.SaveTodos(newTodos, userTodosPath);
+			newTodos.OnTodoAdded += saveHandler;
+			newTodos.OnTodoDeleted += saveHandler;
+			newTodos.OnTodoUpdated += saveHandler;
+			newTodos.OnStatusChanged += saveHandler;
+			AppInfo.AllTodos[newProfile.Id] = newTodos;
 			AppInfo.UndoStack.Clear();
 			AppInfo.RedoStack.Clear();
 			Console.WriteLine("Регистрация прошла успешно! Вы вошли в систему.");

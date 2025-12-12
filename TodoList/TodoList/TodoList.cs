@@ -88,7 +88,7 @@ namespace TodoList
 				Console.WriteLine("Задача с таким номером не найдена.");
 			}
 		}
-		public void UpdateTaskText(int index, string newText)
+		public void Update(int index, string newText)
 		{
 			var item = GetItem(index);
 			if (item != null)

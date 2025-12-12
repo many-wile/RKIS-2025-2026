@@ -16,7 +16,6 @@ namespace TodoList.Commands
 			{
 				AppInfo.CurrentUserTodos.Delete(_index);
 				Console.WriteLine($"Задача {_index} удалена.");
-				FileManager.SaveTodos(AppInfo.CurrentUserTodos, AppInfo.CurrentUserTodosPath);
 			}
 			else
 			{
@@ -28,7 +27,6 @@ namespace TodoList.Commands
 			if (_deletedItem != null)
 			{
 				AppInfo.CurrentUserTodos.Insert(_index, _deletedItem);
-				FileManager.SaveTodos(AppInfo.CurrentUserTodos, AppInfo.CurrentUserTodosPath);
 			}
 		}
 	}
