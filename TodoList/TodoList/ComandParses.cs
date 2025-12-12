@@ -22,16 +22,14 @@ namespace TodoList
 		{
 			if (string.IsNullOrWhiteSpace(inputString))
 				return null;
-			inputString = inputString.Trim();
-			string[] split = inputString.Split(new char[] { ' ' }, 2);
-			string commandName = split[0].ToLower();
-			string args = split.Length > 1 ? split[1] : "";
-
-			if (_commandHandlers.ContainsKey(commandName))
+			var parts = inputString.Trim().Split(new char[] { ' ' }, 2);
+			var commandName = parts[0].ToLower();
+			var args = parts.Length > 1 ? parts[1] : "";
+			if (_commandHandlers.TryGetValue(commandName, out var handler))
 			{
-				return _commandHandlers[commandName](args);
+				return handler(args);
 			}
-
+			Console.WriteLine($"Неизвестная команда: {commandName}");
 			return null;
 		}
 		private static ICommand ParseAdd(string args)
