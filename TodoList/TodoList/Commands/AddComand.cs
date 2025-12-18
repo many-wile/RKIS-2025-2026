@@ -5,6 +5,7 @@ namespace TodoList.Commands
 	{
 		public string TaskText { get; set; }
 		private TodoItem? _addedItem;
+
 		public AddCommand(string taskText)
 		{
 			TaskText = taskText;

@@ -5,6 +5,13 @@ namespace TodoList
 {
 	static class FileManager
 	{
+		public static void SaveTodoList(TodoItem item)
+		{
+			if (AppInfo.CurrentProfileId != null)
+			{
+				SaveTodos(AppInfo.CurrentUserTodos, AppInfo.CurrentUserTodosPath);
+			}
+		}
 		public static void EnsureDataDirectory(string dirPath)
 		{
 			if (!Directory.Exists(dirPath))

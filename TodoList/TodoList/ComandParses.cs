@@ -14,7 +14,8 @@ namespace TodoList
 			_commandHandlers["status"] = ParseStatus;
 			_commandHandlers["view"] = ParseView;
 			_commandHandlers["profile"] = ParseProfile;
-			_commandHandlers["help"] = ParseHelp;
+			_commandHandlers["help"] = (args) => new CommandHelp();
+
 			_commandHandlers["undo"] = (args) => new UndoCommand();
 			_commandHandlers["redo"] = (args) => new RedoCommand();
 		}
@@ -22,15 +23,17 @@ namespace TodoList
 		{
 			if (string.IsNullOrWhiteSpace(inputString))
 				return null;
+
 			var parts = inputString.Trim().Split(new char[] { ' ' }, 2);
 			var commandName = parts[0].ToLower();
 			var args = parts.Length > 1 ? parts[1] : "";
+
 			if (_commandHandlers.TryGetValue(commandName, out var handler))
 			{
 				return handler(args);
 			}
 			Console.WriteLine($"Неизвестная команда: {commandName}");
-			return null;
+			return new CommandHelp();
 		}
 		private static ICommand ParseAdd(string args)
 		{
@@ -55,6 +58,8 @@ namespace TodoList
 		{
 			if (int.TryParse(args, out int idx))
 				return new DeleteCommand(idx);
+
+			Console.WriteLine("Неверный формат аргумента для delete.");
 			return null;
 		}
 		private static ICommand ParseUpdate(string args)
@@ -62,6 +67,8 @@ namespace TodoList
 			string[] parts = args.Split(' ', 2);
 			if (parts.Length == 2 && int.TryParse(parts[0], out int idx))
 				return new UpdateCommand(idx, parts[1]);
+
+			Console.WriteLine("Неверный формат аргументов для update.");
 			return null;
 		}
 		private static ICommand ParseStatus(string args)
@@ -80,6 +87,7 @@ namespace TodoList
 					return null;
 				}
 			}
+			Console.WriteLine("Неверный формат аргументов для status.");
 			return null;
 		}
 		private static ICommand ParseView(string args)
@@ -105,34 +113,6 @@ namespace TodoList
 		private static ICommand ParseProfile(string args)
 		{
 			return new ProfileCommand("profile " + args);
-		}
-		private static ICommand ParseHelp(string args)
-		{
-			Console.WriteLine(@"
-Доступные команды:
-add <текст>          - добавить задачу
-add -m / --multiline - многострочный ввод (!end - завершить)
-status <номер> <статус> - изменить статус задачи
-update <номер> <текст> - изменить текст задачи
-delete <номер>       - удалить задачу
-view [флаги]         - показать задачи
-profile              - показать профиль пользователя
-profile -o / --out   - выйти из текущего профиля
-help                 - показать список команд
-undo                 - отменить последнее действие
-redo                 - повторить отмененное действие
-exit                 - выход
-
-Доступные статусы для команды status:
-NotStarted, InProgress, Completed, Postponed, Failed
-
-Флаги для view:
--i, --index          - показывать индекс задачи
--s, --status         - показывать статус
--d, --update-date    - показывать дату изменения
--a, --all            - показывать всё
-");
-			return null;
 		}
 	}
 }

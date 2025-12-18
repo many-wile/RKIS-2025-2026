@@ -75,12 +75,10 @@ namespace TodoList
 				AppInfo.CurrentProfileId = foundProfile.Id;
 				string userTodosPath = Path.Combine(DataDirectory, $"todos_{foundProfile.Id}.csv");
 				TodoList todos = FileManager.LoadTodos(userTodosPath);
-				Action<TodoItem> saveHandler = (item) => FileManager.SaveTodos(todos, userTodosPath);
-				todos.OnTodoAdded += saveHandler;
-				todos.OnTodoDeleted += saveHandler;
-				todos.OnTodoUpdated += saveHandler;
-				todos.OnStatusChanged += saveHandler;
-
+				todos.OnTodoAdded += FileManager.SaveTodoList;
+				todos.OnTodoDeleted += FileManager.SaveTodoList;
+				todos.OnTodoUpdated += FileManager.SaveTodoList;
+				todos.OnStatusChanged += FileManager.SaveTodoList;
 				AppInfo.AllTodos[foundProfile.Id] = todos;
 				AppInfo.UndoStack.Clear();
 				AppInfo.RedoStack.Clear();
@@ -98,7 +96,7 @@ namespace TodoList
 			string firstName = Console.ReadLine();
 			Console.Write("Введите фамилию: ");
 			string lastName = Console.ReadLine();
-			Console.Write("Введите год рождения: ");
+			Console.Write("Введите год рождения (гггг): ");
 			if (!int.TryParse(Console.ReadLine(), out int birthYear) || birthYear < 1900 || birthYear > DateTime.Now.Year)
 			{
 				Console.WriteLine("Некорректный год рождения. Регистрация отменена.");
@@ -118,12 +116,10 @@ namespace TodoList
 			FileManager.SaveProfiles(AppInfo.AllProfiles, Path.Combine(DataDirectory, ProfilesFileName));
 			AppInfo.CurrentProfileId = newProfile.Id;
 			TodoList newTodos = new TodoList();
-			string userTodosPath = Path.Combine(DataDirectory, $"todos_{newProfile.Id}.csv");
-			Action<TodoItem> saveHandler = (item) => FileManager.SaveTodos(newTodos, userTodosPath);
-			newTodos.OnTodoAdded += saveHandler;
-			newTodos.OnTodoDeleted += saveHandler;
-			newTodos.OnTodoUpdated += saveHandler;
-			newTodos.OnStatusChanged += saveHandler;
+			newTodos.OnTodoAdded += FileManager.SaveTodoList;
+			newTodos.OnTodoDeleted += FileManager.SaveTodoList;
+			newTodos.OnTodoUpdated += FileManager.SaveTodoList;
+			newTodos.OnStatusChanged += FileManager.SaveTodoList;
 			AppInfo.AllTodos[newProfile.Id] = newTodos;
 			AppInfo.UndoStack.Clear();
 			AppInfo.RedoStack.Clear();
