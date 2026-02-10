@@ -15,6 +15,7 @@ namespace TodoList
 			_commandHandlers["view"] = ParseView;
 			_commandHandlers["profile"] = ParseProfile;
 			_commandHandlers["help"] = (args) => new CommandHelp();
+			_commandHandlers["search"] = ParseSearch;
 
 			_commandHandlers["undo"] = (args) => new UndoCommand();
 			_commandHandlers["redo"] = (args) => new RedoCommand();
@@ -34,6 +35,10 @@ namespace TodoList
 			}
 			Console.WriteLine($"Неизвестная команда: {commandName}");
 			return new CommandHelp();
+		}
+		private static ICommand ParseSearch(string args)
+		{
+			return new SearchCommand(args.Trim());
 		}
 		private static ICommand ParseAdd(string args)
 		{
