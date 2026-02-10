@@ -14,9 +14,8 @@ namespace TodoList
 			_commandHandlers["status"] = ParseStatus;
 			_commandHandlers["view"] = ParseView;
 			_commandHandlers["profile"] = ParseProfile;
-			_commandHandlers["help"] = (args) => new CommandHelp();
 			_commandHandlers["search"] = ParseSearch;
-
+			_commandHandlers["help"] = (args) => new CommandHelp();
 			_commandHandlers["undo"] = (args) => new UndoCommand();
 			_commandHandlers["redo"] = (args) => new RedoCommand();
 		}
@@ -24,11 +23,9 @@ namespace TodoList
 		{
 			if (string.IsNullOrWhiteSpace(inputString))
 				return null;
-
 			var parts = inputString.Trim().Split(new char[] { ' ' }, 2);
 			var commandName = parts[0].ToLower();
 			var args = parts.Length > 1 ? parts[1] : "";
-
 			if (_commandHandlers.TryGetValue(commandName, out var handler))
 			{
 				return handler(args);

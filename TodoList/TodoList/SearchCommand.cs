@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+
 namespace TodoList.Commands
 {
 	public class SearchCommand : ICommand
@@ -22,16 +23,17 @@ namespace TodoList.Commands
 		}
 		public void Execute()
 		{
-			if (!ParseArguments()) return;
-
+			if (!ParseArguments())
+			{
+				return;
+			}
 			var todoList = AppInfo.CurrentUserTodos;
 			if (todoList == null || todoList.Count == 0)
 			{
-				Console.WriteLine("Список задач пуст.");
+				Console.WriteLine("Ничего не найдено");
 				return;
 			}
 			var query = todoList.Select((item, index) => new { Item = item, OriginalIndex = index + 1 });
-
 			if (!string.IsNullOrEmpty(_contains))
 				query = query.Where(x => x.Item.Text.IndexOf(_contains, StringComparison.OrdinalIgnoreCase) >= 0);
 			if (!string.IsNullOrEmpty(_startsWith))
@@ -56,33 +58,31 @@ namespace TodoList.Commands
 				query = query.OrderByDescending(x => x.OriginalIndex);
 			}
 			if (_top.HasValue)
+			{
 				query = query.Take(_top.Value);
+			}
 			var results = query.ToList();
 			if (results.Any())
 			{
-				Console.WriteLine($"Найдено задач: {results.Count}");
-				Console.WriteLine();
-				string headerFormat = "{0,-6} | {1,-30} | {2,-12} | {3,-18}";
-				string header = string.Format(headerFormat, "Index", "Text", "Status", "LastUpdate");
-				Console.WriteLine(header);
-				Console.WriteLine(new string('-', header.Length));
+				Console.WriteLine($"Найдено задач: {results.Count}\n");
+				string format = "{0,-6} | {1,-30} | {2,-12} | {3,-18}";
+				Console.WriteLine(string.Format(format, "Index", "Text", "Status", "LastUpdate"));
+				Console.WriteLine(new string('-', 75));
 				foreach (var res in results)
 				{
-					string rawText = res.Item.Text.Replace("\n", " ").Replace("\r", "");
-					string formattedText = rawText.Length > 27
-						? rawText.Substring(0, 27) + "..."
-						: rawText;
-					Console.WriteLine(headerFormat,
+					string text = res.Item.Text.Replace("\n", " ");
+					if (text.Length > 27) text = text.Substring(0, 27) + "...";
+					Console.WriteLine(string.Format(format,
 						res.OriginalIndex,
-						formattedText,
+						text,
 						res.Item.Status,
-						res.Item.LastUpdate.ToString("yyyy-MM-dd HH:mm"));
+						res.Item.LastUpdate.ToString("yyyy-MM-dd HH:mm")));
 				}
-				Console.WriteLine(new string('-', header.Length));
+				Console.WriteLine(new string('-', 75));
 			}
 			else
 			{
-				Console.WriteLine("Задачи, удовлетворяющие условиям, не найдены.");
+				Console.WriteLine("Ничего не найдено");
 			}
 		}
 		public void Unexecute() { }
@@ -95,39 +95,64 @@ namespace TodoList.Commands
 				if (i + 1 < args.Count)
 				{
 					string val = args[i + 1];
-					if (arg == "--contains") { _contains = val; i++; continue; }
-					if (arg == "--starts-with") { _startsWith = val; i++; continue; }
-					if (arg == "--ends-with") { _endsWith = val; i++; continue; }
-					if (arg == "--status")
+					bool consumed = true;
+					switch (arg)
 					{
-						if (Enum.TryParse<TodoStatus>(val, true, out var st)) _status = st;
-						else { Console.WriteLine($"Ошибка статуса: {val}"); return false; }
-						i++; continue;
+						case "--contains": _contains = val; break;
+						case "--starts-with": _startsWith = val; break;
+						case "--ends-with": _endsWith = val; break;
+						case "--status":
+							if (Enum.TryParse<TodoStatus>(val, true, out var st)) _status = st;
+							else
+							{
+								Console.WriteLine($"Ошибка: Статус '{val}' не существует.");
+								return false;
+							}
+							break;
+						case "--from":
+							if (DateTime.TryParse(val, out var df)) _dateFrom = df.Date;
+							else
+							{
+								Console.WriteLine($"Ошибка: Некорректная дата '{val}' для флага --from. Используйте формат yyyy-MM-dd.");
+								return false;
+							}
+							break;
+
+						case "--to":
+							if (DateTime.TryParse(val, out var dt)) _dateTo = dt.Date;
+							else
+							{
+								Console.WriteLine($"Ошибка: Некорректная дата '{val}' для флага --to. Используйте формат yyyy-MM-dd.");
+								return false;
+							}
+							break;
+						case "--sort":
+							if (val == "text" || val == "date") _sortBy = val;
+							else
+							{
+								Console.WriteLine("Ошибка: Параметр sort должен быть 'text' или 'date'.");
+								return false;
+							}
+							break;
+						case "--top":
+							if (int.TryParse(val, out int t))
+							{
+								if (t > 0) _top = t;
+								else
+								{
+									Console.WriteLine("Ошибка: Значение --top должно быть больше 0.");
+									return false;
+								}
+							}
+							else
+							{
+								Console.WriteLine($"Ошибка: Значение '{val}' для --top не является целым числом.");
+								return false;
+							}
+							break;
+						default: consumed = false; break;
 					}
-					if (arg == "--from")
-					{
-						if (DateTime.TryParse(val, out var d)) _dateFrom = d.Date;
-						else { Console.WriteLine("Неверный формат --from"); return false; }
-						i++; continue;
-					}
-					if (arg == "--to")
-					{
-						if (DateTime.TryParse(val, out var d)) _dateTo = d.Date;
-						else { Console.WriteLine("Неверный формат --to"); return false; }
-						i++; continue;
-					}
-					if (arg == "--sort")
-					{
-						if (val == "text" || val == "date") _sortBy = val;
-						else { Console.WriteLine("sort: text/date"); return false; }
-						i++; continue;
-					}
-					if (arg == "--top")
-					{
-						if (int.TryParse(val, out int t)) _top = t;
-						else { Console.WriteLine("--top должно быть числом"); return false; }
-						i++; continue;
-					}
+					if (consumed) { i++; continue; }
 				}
 				if (arg == "--desc") _desc = true;
 				else if (i == 0 && !arg.StartsWith("--")) _contains = args[i];
@@ -138,11 +163,13 @@ namespace TodoList.Commands
 		{
 			var result = new List<string>();
 			if (string.IsNullOrWhiteSpace(input)) return result;
+
 			bool inQuotes = false;
 			StringBuilder sb = new StringBuilder();
+
 			foreach (char c in input)
 			{
-				if (c == '\"') inQuotes = !inQuotes;
+				if (c == '"') inQuotes = !inQuotes;
 				else if (c == ' ' && !inQuotes)
 				{
 					if (sb.Length > 0) { result.Add(sb.ToString()); sb.Clear(); }
