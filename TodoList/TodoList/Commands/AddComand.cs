@@ -1,15 +1,11 @@
 ﻿using System;
 namespace TodoList.Commands
 {
-	public class AddCommand : ICommand
+	public class AddCommand : ICommand, IUndo
 	{
 		public string TaskText { get; set; }
 		private TodoItem? _addedItem;
-
-		public AddCommand(string taskText)
-		{
-			TaskText = taskText;
-		}
+		public AddCommand(string taskText) => TaskText = taskText;
 		public void Execute()
 		{
 			if (string.IsNullOrWhiteSpace(TaskText))
@@ -24,9 +20,7 @@ namespace TodoList.Commands
 		public void Unexecute()
 		{
 			if (_addedItem != null && AppInfo.CurrentUserTodos.Contains(_addedItem))
-			{
 				AppInfo.CurrentUserTodos.Remove(_addedItem);
-			}
 		}
 	}
 }

@@ -35,6 +35,5 @@ search [флаги]       - расширенный поиск
 search --status InProgress --sort date --desc --top 5
 ");
 		}
-		public void Unexecute() { }
 	}
 }

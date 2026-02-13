@@ -6,14 +6,10 @@ namespace TodoList.Commands
 		private bool _isLogout;
 		public ProfileCommand(string inputString)
 		{
-			_isLogout = false;
 			if (!string.IsNullOrWhiteSpace(inputString))
 			{
 				string[] parts = inputString.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-				if (parts.Length > 1 && (parts[1] == "-o" || parts[1] == "--out"))
-				{
-					_isLogout = true;
-				}
+				_isLogout = parts.Length > 1 && (parts[1] == "-o" || parts[1] == "--out");
 			}
 		}
 		public void Execute()
@@ -22,27 +18,13 @@ namespace TodoList.Commands
 			{
 				if (AppInfo.CurrentProfile != null)
 				{
-					Console.WriteLine($"Пользователь {AppInfo.CurrentProfile.Login} вышел из системы.");
+					Console.WriteLine($"Пользователь {AppInfo.CurrentProfile.Login} вышел.");
 					AppInfo.CurrentProfileId = null;
 					AppInfo.UndoStack.Clear();
 					AppInfo.RedoStack.Clear();
 				}
 			}
-			else
-			{
-				if (AppInfo.CurrentProfile != null)
-				{
-					Console.WriteLine(AppInfo.CurrentProfile.GetInfo());
-				}
-				else
-				{
-					Console.WriteLine("Профиль не загружен.");
-				}
-			}
-		}
-		public void Unexecute()
-		{
-
+			else if (AppInfo.CurrentProfile != null) Console.WriteLine(AppInfo.CurrentProfile.GetInfo());
 		}
 	}
 }

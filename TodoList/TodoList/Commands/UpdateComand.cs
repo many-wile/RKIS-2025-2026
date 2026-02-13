@@ -1,7 +1,7 @@
 ﻿using System;
 namespace TodoList.Commands
 {
-	public class UpdateCommand : ICommand
+	public class UpdateCommand : ICommand, IUndo
 	{
 		public int Index { get; set; }
 		public string NewText { get; set; }
@@ -20,18 +20,13 @@ namespace TodoList.Commands
 				AppInfo.CurrentUserTodos.Update(Index, NewText);
 				Console.WriteLine($"Задача {Index} обновлена.");
 			}
-			else
-			{
-				Console.WriteLine("Задача с таким номером не найдена.");
-			}
+			else Console.WriteLine("Задача не найдена.");
 		}
 		public void Unexecute()
 		{
 			var item = AppInfo.CurrentUserTodos.GetItem(Index);
 			if (item != null && _oldText != null)
-			{
 				AppInfo.CurrentUserTodos.Update(Index, _oldText);
-			}
 		}
 	}
 }

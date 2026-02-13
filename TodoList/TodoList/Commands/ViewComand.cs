@@ -7,19 +7,11 @@ namespace TodoList.Commands
 		public bool ShowDone { get; set; }
 		public bool ShowDate { get; set; }
 		public bool ShowAll { get; set; }
-		public ViewCommand()
-		{
-		}
+
 		public void Execute()
 		{
-			if (ShowAll)
-			{
-				ShowIndex = ShowDone = ShowDate = true;
-			}
+			if (ShowAll) ShowIndex = ShowDone = ShowDate = true;
 			AppInfo.CurrentUserTodos.View(ShowIndex, ShowDone, ShowDate);
-		}
-		public void Unexecute()
-		{
 		}
 	}
 }

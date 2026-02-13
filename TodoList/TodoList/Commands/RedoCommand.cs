@@ -16,12 +16,8 @@ namespace TodoList.Commands
 			}
 			else
 			{
-				Console.WriteLine("Нечего повторять (Redo стек пуст).");
+				Console.WriteLine("Нечего повторять.");
 			}
-		}
-		public void Unexecute()
-		{
-
 		}
 	}
 }
