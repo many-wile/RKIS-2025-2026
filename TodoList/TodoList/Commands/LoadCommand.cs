@@ -1,7 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using TodoList.Exceptions;
-
 namespace TodoList.Commands
 {
 	public class LoadCommand : ICommand
@@ -9,6 +9,7 @@ namespace TodoList.Commands
 		private readonly string _args;
 		private int _downloadsCount;
 		private int _downloadSize;
+		private static readonly object _consoleLock = new object();
 		public LoadCommand(string args)
 		{
 			_args = args;
@@ -32,8 +33,47 @@ namespace TodoList.Commands
 		}
 		private async Task RunAsync()
 		{
-			Console.WriteLine($"[Mock] Подготовка к {_downloadsCount} загрузкам размером {_downloadSize}...");
-			await Task.CompletedTask;
+			int startRow = Console.CursorTop;
+			for (int i = 0; i < _downloadsCount; i++)
+			{
+				Console.WriteLine();
+			}
+			List<Task> tasks = new List<Task>();
+			for (int i = 0; i < _downloadsCount; i++)
+			{
+				int index = i;
+				int row = startRow + index;
+				tasks.Add(DownloadAsync(row));
+			}
+			await Task.WhenAll(tasks);
+			lock (_consoleLock)
+			{
+				Console.SetCursorPosition(0, startRow + _downloadsCount);
+				Console.WriteLine("Все загрузки завершены.");
+			}
+		}
+		private async Task DownloadAsync(int row)
+		{
+			Random random = new Random(Guid.NewGuid().GetHashCode());
+
+			for (int i = 0; i <= _downloadSize; i++)
+			{
+				double percentage = _downloadSize == 0 ? 100 : ((double)i / _downloadSize) * 100;
+				int percentInt = (int)percentage;
+				int filledBars = percentInt / 5;
+				if (filledBars > 20) filledBars = 20;
+				int emptyBars = 20 - filledBars;
+				string bar = $"[{new string('#', filledBars)}{new string('-', emptyBars)}] {percentInt}%";
+				lock (_consoleLock)
+				{
+					Console.SetCursorPosition(0, row);
+					Console.Write(bar);
+				}
+				if (i < _downloadSize)
+				{
+					await Task.Delay(random.Next(10, 50));
+				}
+			}
 		}
 	}
 }
