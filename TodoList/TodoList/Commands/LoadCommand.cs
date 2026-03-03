@@ -33,42 +33,41 @@ namespace TodoList.Commands
 		}
 		private async Task RunAsync()
 		{
-			int startRow = Console.CursorTop;
 			for (int i = 0; i < _downloadsCount; i++)
 			{
 				Console.WriteLine();
 			}
+			int startRow = Console.CursorTop - _downloadsCount;
 			List<Task> tasks = new List<Task>();
 			for (int i = 0; i < _downloadsCount; i++)
 			{
-				int index = i;
-				int row = startRow + index;
-				tasks.Add(DownloadAsync(row));
+				int row = startRow + i;
+				tasks.Add(DownloadAsync(row, i + 1));
 			}
 			await Task.WhenAll(tasks);
 			lock (_consoleLock)
 			{
 				Console.SetCursorPosition(0, startRow + _downloadsCount);
-				Console.WriteLine("Все загрузки завершены.");
+				Console.WriteLine("\nВсе загрузки завершены.");
 			}
 		}
-		private async Task DownloadAsync(int row)
+		private async Task DownloadAsync(int row, int downloadNumber)
 		{
 			Random random = new Random(Guid.NewGuid().GetHashCode());
-
 			for (int i = 0; i <= _downloadSize; i++)
 			{
-				double percentage = _downloadSize == 0 ? 100 : ((double)i / _downloadSize) * 100;
+				double percentage = ((double)i / _downloadSize) * 100;
 				int percentInt = (int)percentage;
 				int filledBars = percentInt / 5;
 				if (filledBars > 20) filledBars = 20;
 				int emptyBars = 20 - filledBars;
-				string bar = $"[{new string('#', filledBars)}{new string('-', emptyBars)}] {percentInt}%";
+				string bar = $"Поток {downloadNumber,2}: [{new string('#', filledBars)}{new string('-', emptyBars)}] {i}/{_downloadSize} ({percentInt,3}%)";
 				lock (_consoleLock)
 				{
 					Console.SetCursorPosition(0, row);
-					Console.Write(bar);
+					Console.Write(bar.PadRight(Console.WindowWidth - 1));
 				}
+
 				if (i < _downloadSize)
 				{
 					await Task.Delay(random.Next(10, 50));
