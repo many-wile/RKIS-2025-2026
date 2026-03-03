@@ -27,9 +27,9 @@ namespace TodoList.Commands
 				Console.WriteLine();
 			}
 			List<Task> tasks = new List<Task>();
-			for (int i = 0; i < _downloadsCount; i++)
+			for (int index = 0; index < _downloadsCount; index++)
 			{
-				int row = startRow + i;
+				int row = startRow + index;
 				tasks.Add(DownloadAsync(row));
 			}
 			await Task.WhenAll(tasks);
