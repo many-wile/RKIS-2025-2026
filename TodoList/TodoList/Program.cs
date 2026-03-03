@@ -9,8 +9,6 @@ namespace TodoList
 		static void Main(string[] args)
 		{
 			Console.WriteLine("TodoList запущен. Введите 'help' для списка команд.");
-			if (AppInfo.CurrentUserTodos == null)
-				AppInfo.CurrentUserTodos = new TodoList(); 
 			while (true)
 			{
 				Console.Write("> ");

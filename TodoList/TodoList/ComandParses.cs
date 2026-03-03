@@ -19,6 +19,7 @@ namespace TodoList
 			_commandHandlers["help"] = (args) => new CommandHelp();
 			_commandHandlers["undo"] = (args) => new UndoCommand();
 			_commandHandlers["redo"] = (args) => new RedoCommand();
+			_commandHandlers["load"] = ParseLoad;
 		}
 		public static ICommand Parse(string inputString)
 		{
@@ -108,5 +109,6 @@ namespace TodoList
 			return command;
 		}
 		private static ICommand ParseProfile(string args) => new ProfileCommand("profile " + args);
+		private static ICommand ParseLoad(string args) => new LoadCommand(args);
 	}
 }
