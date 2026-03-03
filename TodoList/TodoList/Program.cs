@@ -8,6 +8,7 @@ namespace TodoList
 	{
 		static void Main(string[] args)
 		{
+			Console.WriteLine("СДЕЛАНО by НЕСТЕРЕНКО ГОРЕЛОВ");
 			Console.WriteLine("TodoList запущен. Введите 'help' для списка команд.");
 			while (true)
 			{
@@ -18,10 +19,11 @@ namespace TodoList
 				{
 					ICommand command = ParseCommand(input);
 					command.Execute();
+
 					if (command is IUndo && !(command is UndoCommand) && !(command is RedoCommand))
 					{
 						AppInfo.UndoStack.Push(command);
-						AppInfo.RedoStack.Clear(); 
+						AppInfo.RedoStack.Clear();
 					}
 				}
 				catch (TaskNotFoundException ex)
@@ -50,6 +52,7 @@ namespace TodoList
 		{
 			var parts = input.Split(' ', StringSplitOptions.RemoveEmptyEntries);
 			if (parts.Length == 0) throw new InvalidCommandException("Пустая команда.");
+
 			string commandName = parts[0].ToLower();
 			string args = parts.Length > 1 ? input.Substring(commandName.Length).Trim() : "";
 			switch (commandName)
@@ -81,6 +84,8 @@ namespace TodoList
 					return new ProfileCommand(input);
 				case "help":
 					return new CommandHelp();
+				case "load": 
+					return new LoadCommand(args);
 				case "exit":
 					Environment.Exit(0);
 					return null!;
