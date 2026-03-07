@@ -23,13 +23,15 @@ namespace TodoList
 		{
 			try
 			{
-				List<string> linesToWrite = new List<string>();
-				linesToWrite.Add("Id;Login;Password;FirstName;LastName;BirthYear");
-				foreach (var profile in profiles)
+				using (FileStream fs = new FileStream(filePath, FileMode.Create, FileAccess.Write))
+				using (StreamWriter writer = new StreamWriter(fs))
 				{
-					linesToWrite.Add(profile.ToCsvString());
+					writer.WriteLine("Id;Login;Password;FirstName;LastName;BirthYear");
+					foreach (var profile in profiles)
+					{
+						writer.WriteLine(profile.ToCsvString());
+					}
 				}
-				File.WriteAllLines(filePath, linesToWrite);
 			}
 			catch (Exception ex)
 			{
@@ -45,23 +47,26 @@ namespace TodoList
 			}
 			try
 			{
-				string[] lines = File.ReadAllLines(filePath);
-				if (lines.Length <= 1)
+				using (FileStream fs = new FileStream(filePath, FileMode.Open, FileAccess.Read))
+				using (StreamReader reader = new StreamReader(fs))
 				{
-					return profiles;
-				}
-				for (int i = 1; i < lines.Length; i++)
-				{
-					string[] parts = lines[i].Split(';');
-					if (parts.Length == 6)
+					string header = reader.ReadLine();
+					if (header == null) return profiles;
+
+					string line;
+					while ((line = reader.ReadLine()) != null)
 					{
-						if (Guid.TryParse(parts[0], out Guid id) && int.TryParse(parts[5], out int birthYear))
+						string[] parts = line.Split(';');
+						if (parts.Length == 6)
 						{
-							string login = parts[1];
-							string password = parts[2];
-							string firstName = parts[3];
-							string lastName = parts[4];
-							profiles.Add(new Profile(id, login, password, firstName, lastName, birthYear));
+							if (Guid.TryParse(parts[0], out Guid id) && int.TryParse(parts[5], out int birthYear))
+							{
+								string login = parts[1];
+								string password = parts[2];
+								string firstName = parts[3];
+								string lastName = parts[4];
+								profiles.Add(new Profile(id, login, password, firstName, lastName, birthYear));
+							}
 						}
 					}
 				}
@@ -74,24 +79,27 @@ namespace TodoList
 		}
 		public static void SaveTodos(TodoList todos, string filePath)
 		{
+			if (todos == null) return;
 			try
 			{
-				List<string> linesToWrite = new List<string>();
-				linesToWrite.Add("Index;Text;Status;LastUpdate");
-				for (int i = 0; i < todos.Count; i++)
+				using (FileStream fs = new FileStream(filePath, FileMode.Create, FileAccess.Write))
+				using (StreamWriter writer = new StreamWriter(fs))
 				{
-					TodoItem item = todos[i];
-					if (item != null)
+					writer.WriteLine("Index;Text;Status;LastUpdate");
+					for (int i = 0; i < todos.Count; i++)
 					{
-						string processedText = item.Text.Replace("\n", "\\n").Replace("\"", "\"\"");
-						if (processedText.Contains(";"))
+						TodoItem item = todos[i];
+						if (item != null)
 						{
-							processedText = $"\"{processedText}\"";
+							string processedText = item.Text.Replace("\n", "\\n").Replace("\"", "\"\"");
+							if (processedText.Contains(";"))
+							{
+								processedText = $"\"{processedText}\"";
+							}
+							writer.WriteLine($"{i};{processedText};{item.Status.ToString()};{item.LastUpdate:o}");
 						}
-						linesToWrite.Add($"{i};{processedText};{item.Status.ToString()};{item.LastUpdate:o}");
 					}
 				}
-				File.WriteAllLines(filePath, linesToWrite);
 			}
 			catch (Exception ex)
 			{
@@ -107,20 +115,22 @@ namespace TodoList
 			}
 			try
 			{
-				string[] lines = File.ReadAllLines(filePath);
-				if (lines.Length <= 1)
+				using (FileStream fs = new FileStream(filePath, FileMode.Open, FileAccess.Read))
+				using (StreamReader reader = new StreamReader(fs))
 				{
-					return todos;
-				}
-				for (int i = 1; i < lines.Length; i++)
-				{
-					List<string> parts = ParseCsvLine(lines[i], ';');
-					if (parts.Count == 4)
+					string header = reader.ReadLine(); 
+					if (header == null) return todos;
+					string line;
+					while ((line = reader.ReadLine()) != null)
 					{
-						string text = parts[1].Replace("\\n", "\n");
-						if (Enum.TryParse<TodoStatus>(parts[2], true, out TodoStatus status) && DateTime.TryParse(parts[3], out DateTime lastUpdate))
+						List<string> parts = ParseCsvLine(line, ';');
+						if (parts.Count == 4)
 						{
-							todos.Add(new TodoItem(text, status, lastUpdate));
+							string text = parts[1].Replace("\\n", "\n");
+							if (Enum.TryParse<TodoStatus>(parts[2], true, out TodoStatus status) && DateTime.TryParse(parts[3], out DateTime lastUpdate))
+							{
+								todos.Add(new TodoItem(text, status, lastUpdate));
+							}
 						}
 					}
 				}
