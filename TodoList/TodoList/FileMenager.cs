@@ -1,10 +1,13 @@
 ﻿using System;
 using System.IO;
 using System.Collections.Generic;
+using System.Security.Cryptography;
 namespace TodoList
 {
 	static class FileManager
 	{
+		private static readonly byte[] _aesKey = { 0x45, 0x12, 0x99, 0x1C, 0x7B, 0x3A, 0x2F, 0x88, 0x10, 0x44, 0xBB, 0x5D, 0x9A, 0x8E, 0x22, 0x77, 0x11, 0x55, 0x33, 0x66, 0x99, 0xAA, 0xCC, 0xEE, 0xDD, 0xFF, 0x00, 0x12, 0x34, 0x56, 0x78, 0x90 };
+		private static readonly byte[] _aesIv = { 0x01, 0x23, 0x45, 0x67, 0x89, 0xAB, 0xCD, 0xEF, 0xFE, 0xDC, 0xBA, 0x98, 0x76, 0x54, 0x32, 0x10 };
 		public static void SaveTodoList(TodoItem item)
 		{
 			if (AppInfo.CurrentProfileId != null)
@@ -23,13 +26,20 @@ namespace TodoList
 		{
 			try
 			{
-				using (FileStream fs = new FileStream(filePath, FileMode.Create, FileAccess.Write))
-				using (StreamWriter writer = new StreamWriter(fs))
+				using (Aes aes = Aes.Create())
 				{
-					writer.WriteLine("Id;Login;Password;FirstName;LastName;BirthYear");
-					foreach (var profile in profiles)
+					aes.Key = _aesKey;
+					aes.IV = _aesIv;
+					using (FileStream fs = new FileStream(filePath, FileMode.Create, FileAccess.Write))
+					using (BufferedStream bs = new BufferedStream(fs))
+					using (CryptoStream cs = new CryptoStream(bs, aes.CreateEncryptor(), CryptoStreamMode.Write))
+					using (StreamWriter writer = new StreamWriter(cs))
 					{
-						writer.WriteLine(profile.ToCsvString());
+						writer.WriteLine("Id;Login;Password;FirstName;LastName;BirthYear");
+						foreach (var profile in profiles)
+						{
+							writer.WriteLine(profile.ToCsvString());
+						}
 					}
 				}
 			}
@@ -47,25 +57,31 @@ namespace TodoList
 			}
 			try
 			{
-				using (FileStream fs = new FileStream(filePath, FileMode.Open, FileAccess.Read))
-				using (StreamReader reader = new StreamReader(fs))
+				using (Aes aes = Aes.Create())
 				{
-					string header = reader.ReadLine();
-					if (header == null) return profiles;
-
-					string line;
-					while ((line = reader.ReadLine()) != null)
+					aes.Key = _aesKey;
+					aes.IV = _aesIv;
+					using (FileStream fs = new FileStream(filePath, FileMode.Open, FileAccess.Read))
+					using (BufferedStream bs = new BufferedStream(fs))
+					using (CryptoStream cs = new CryptoStream(bs, aes.CreateDecryptor(), CryptoStreamMode.Read))
+					using (StreamReader reader = new StreamReader(cs))
 					{
-						string[] parts = line.Split(';');
-						if (parts.Length == 6)
+						string header = reader.ReadLine();
+						if (header == null) return profiles;
+						string line;
+						while ((line = reader.ReadLine()) != null)
 						{
-							if (Guid.TryParse(parts[0], out Guid id) && int.TryParse(parts[5], out int birthYear))
+							string[] parts = line.Split(';');
+							if (parts.Length == 6)
 							{
-								string login = parts[1];
-								string password = parts[2];
-								string firstName = parts[3];
-								string lastName = parts[4];
-								profiles.Add(new Profile(id, login, password, firstName, lastName, birthYear));
+								if (Guid.TryParse(parts[0], out Guid id) && int.TryParse(parts[5], out int birthYear))
+								{
+									string login = parts[1];
+									string password = parts[2];
+									string firstName = parts[3];
+									string lastName = parts[4];
+									profiles.Add(new Profile(id, login, password, firstName, lastName, birthYear));
+								}
 							}
 						}
 					}
@@ -80,23 +96,31 @@ namespace TodoList
 		public static void SaveTodos(TodoList todos, string filePath)
 		{
 			if (todos == null) return;
+
 			try
 			{
-				using (FileStream fs = new FileStream(filePath, FileMode.Create, FileAccess.Write))
-				using (StreamWriter writer = new StreamWriter(fs))
+				using (Aes aes = Aes.Create())
 				{
-					writer.WriteLine("Index;Text;Status;LastUpdate");
-					for (int i = 0; i < todos.Count; i++)
+					aes.Key = _aesKey;
+					aes.IV = _aesIv;
+					using (FileStream fs = new FileStream(filePath, FileMode.Create, FileAccess.Write))
+					using (BufferedStream bs = new BufferedStream(fs))
+					using (CryptoStream cs = new CryptoStream(bs, aes.CreateEncryptor(), CryptoStreamMode.Write))
+					using (StreamWriter writer = new StreamWriter(cs))
 					{
-						TodoItem item = todos[i];
-						if (item != null)
+						writer.WriteLine("Index;Text;Status;LastUpdate");
+						for (int i = 0; i < todos.Count; i++)
 						{
-							string processedText = item.Text.Replace("\n", "\\n").Replace("\"", "\"\"");
-							if (processedText.Contains(";"))
+							TodoItem item = todos[i];
+							if (item != null)
 							{
-								processedText = $"\"{processedText}\"";
+								string processedText = item.Text.Replace("\n", "\\n").Replace("\"", "\"\"");
+								if (processedText.Contains(";"))
+								{
+									processedText = $"\"{processedText}\"";
+								}
+								writer.WriteLine($"{i};{processedText};{item.Status.ToString()};{item.LastUpdate:o}");
 							}
-							writer.WriteLine($"{i};{processedText};{item.Status.ToString()};{item.LastUpdate:o}");
 						}
 					}
 				}
@@ -115,21 +139,28 @@ namespace TodoList
 			}
 			try
 			{
-				using (FileStream fs = new FileStream(filePath, FileMode.Open, FileAccess.Read))
-				using (StreamReader reader = new StreamReader(fs))
+				using (Aes aes = Aes.Create())
 				{
-					string header = reader.ReadLine(); 
-					if (header == null) return todos;
-					string line;
-					while ((line = reader.ReadLine()) != null)
+					aes.Key = _aesKey;
+					aes.IV = _aesIv;
+					using (FileStream fs = new FileStream(filePath, FileMode.Open, FileAccess.Read))
+					using (BufferedStream bs = new BufferedStream(fs))
+					using (CryptoStream cs = new CryptoStream(bs, aes.CreateDecryptor(), CryptoStreamMode.Read))
+					using (StreamReader reader = new StreamReader(cs))
 					{
-						List<string> parts = ParseCsvLine(line, ';');
-						if (parts.Count == 4)
+						string header = reader.ReadLine();
+						if (header == null) return todos;
+						string line;
+						while ((line = reader.ReadLine()) != null)
 						{
-							string text = parts[1].Replace("\\n", "\n");
-							if (Enum.TryParse<TodoStatus>(parts[2], true, out TodoStatus status) && DateTime.TryParse(parts[3], out DateTime lastUpdate))
+							List<string> parts = ParseCsvLine(line, ';');
+							if (parts.Count == 4)
 							{
-								todos.Add(new TodoItem(text, status, lastUpdate));
+								string text = parts[1].Replace("\\n", "\n");
+								if (Enum.TryParse<TodoStatus>(parts[2], true, out TodoStatus status) && DateTime.TryParse(parts[3], out DateTime lastUpdate))
+								{
+									todos.Add(new TodoItem(text, status, lastUpdate));
+								}
 							}
 						}
 					}
