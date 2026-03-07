@@ -5,7 +5,7 @@ namespace TodoList.Tests;
 public class TodoItemTests
 {
 	[Fact]
-	public void NewTodoItem_HasNotStartedStatus_AndCurrentDate()
+	public void Constructor_ValidText_SetsDefaultStatusAndDate()
 	{
 		string text = "Купить хлеб";
 		TodoItem item = new TodoItem(text);
@@ -14,20 +14,22 @@ public class TodoItemTests
 		Assert.True((DateTime.Now - item.LastUpdate).TotalSeconds < 1);
 	}
 	[Fact]
-	public void ChangeStatus_UpdatesStatus_AndChangesLastUpdate()
+	public void ChangeStatus_ValidStatus_UpdatesStatusAndLastUpdate()
 	{
 		TodoItem item = new TodoItem("Тест", TodoStatus.NotStarted, DateTime.Now.AddDays(-1));
 		DateTime oldDate = item.LastUpdate;
-		item.ChangeStatus(TodoStatus.Completed);
-		Assert.Equal(TodoStatus.Completed, item.Status);
+		TodoStatus newStatus = TodoStatus.Completed;
+		item.ChangeStatus(newStatus);
+		Assert.Equal(newStatus, item.Status);
 		Assert.NotEqual(oldDate, item.LastUpdate);
 	}
 	[Fact]
-	public void UpdateText_ChangesText_AndChangesLastUpdate()
+	public void UpdateText_ValidText_ChangesTextAndLastUpdate()
 	{
 		TodoItem item = new TodoItem("Старый текст", TodoStatus.NotStarted, DateTime.Now.AddDays(-1));
-		item.UpdateText("Новый текст");
-		Assert.Equal("Новый текст", item.Text);
+		string newText = "Новый текст";
+		item.UpdateText(newText);
+		Assert.Equal(newText, item.Text);
 		Assert.True(item.LastUpdate.Date == DateTime.Now.Date);
 	}
 }

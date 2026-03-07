@@ -5,7 +5,7 @@ namespace TodoList.Tests;
 public class ProfileTests
 {
 	[Fact]
-	public void Constructor_SetsPropertiesCorrectly()
+	public void Constructor_ValidArguments_SetsProperties()
 	{
 		string firstName = "Иван";
 		string lastName = "Иванов";
@@ -21,7 +21,7 @@ public class ProfileTests
 		Assert.Equal(password, profile.Password);
 	}
 	[Fact]
-	public void ToCsvString_ReturnsCorrectFormat()
+	public void ToCsvString_ValidProfile_ReturnsCorrectFormat()
 	{
 		Guid expectedId = Guid.NewGuid();
 		Profile profile = new Profile(expectedId, "user", "pass", "Name", "Last", 2000);
@@ -30,7 +30,7 @@ public class ProfileTests
 		Assert.Equal(expectedCsv, actualCsv);
 	}
 	[Fact]
-	public void GetInfo_CalculatesAgeCorrectly()
+	public void GetInfo_ValidProfile_ReturnsStringWithCorrectAge()
 	{
 		int currentYear = DateTime.Now.Year;
 		int birthYear = 1990;

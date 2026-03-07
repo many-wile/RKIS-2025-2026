@@ -6,45 +6,68 @@ using TodoList.Exceptions;
 namespace TodoList.Tests;
 public class CommandParserTests
 {
-	[Fact]
-	public void Parse_EmptyString_ReturnsNull()
+	[Theory]
+	[InlineData("")]
+	[InlineData(" ")]
+	[InlineData("   ")]
+	[InlineData("\t")]
+	public void Parse_EmptyOrWhitespaceString_ReturnsNull(string input)
 	{
-		var result = CommandParser.Parse("   ");
+		var result = CommandParser.Parse(input);
 		Assert.Null(result);
 	}
-	[Fact]
-	public void Parse_ValidAddCommand_ReturnsAddCommandInstance()
+	[Theory]
+	[InlineData("add купить хлеб", "купить хлеб")]
+	[InlineData("add    помыть окно   ", "помыть окно")] 
+	[InlineData("Add сходить в кино", "сходить в кино")] 
+	public void Parse_ValidAddCommand_ReturnsAddCommandWithCorrectText(string input, string expectedText)
 	{
-		var result = CommandParser.Parse("add Купить молоко");
+		var result = CommandParser.Parse(input);
 		var addCommand = Assert.IsType<AddCommand>(result);
-		Assert.Equal("Купить молоко", addCommand.TaskText);
+		Assert.Equal(expectedText, addCommand.TaskText);
 	}
-	[Fact]
-	public void Parse_ValidDeleteCommand_ReturnsDeleteCommandInstance()
+	[Theory]
+	[InlineData("fly to the moon")]
+	[InlineData("создать задачу")]
+	[InlineData("12345")]
+	[InlineData("ad d test")]
+	public void Parse_UnknownCommand_ThrowsInvalidCommandException(string input)
 	{
-		var result = CommandParser.Parse("delete 5");
-		Assert.IsType<DeleteCommand>(result);
-	}
-	[Fact]
-	public void Parse_UnknownCommand_ThrowsInvalidCommandException()
-	{
-		var exception = Assert.Throws<InvalidCommandException>(() =>
-			CommandParser.Parse("fly to the moon")
-		);
+		Action act;
+		act = () => CommandParser.Parse(input);
+		var exception = Assert.Throws<InvalidCommandException>(act);
 		Assert.Contains("не найдена", exception.Message);
 	}
-	[Fact]
-	public void Parse_AddWithoutText_ThrowsInvalidArgumentException()
+	[Theory]
+	[InlineData("add")]
+	[InlineData("add ")]
+	[InlineData("add    ")]
+	public void Parse_AddWithoutText_ThrowsInvalidArgumentException(string input)
 	{
-		Assert.Throws<InvalidArgumentException>(() =>
-			CommandParser.Parse("add ")
-		);
+		Action act;
+		act = () => CommandParser.Parse(input);
+		Assert.Throws<InvalidArgumentException>(act);
 	}
-	[Fact]
-	public void Parse_StatusWithInvalidStatusName_ThrowsInvalidArgumentException()
+	[Theory]
+	[InlineData("delete")]
+	[InlineData("delete abc")]
+	[InlineData("delete 1.5")]
+	[InlineData("delete номер 5")]
+	public void Parse_DeleteWithInvalidFormat_ThrowsInvalidArgumentException(string input)
 	{
-		Assert.Throws<InvalidArgumentException>(() =>
-			CommandParser.Parse("status 1 SuperDone")
-		);
+		Action act;
+		act = () => CommandParser.Parse(input);
+		Assert.Throws<InvalidArgumentException>(act);
+	}
+	[Theory]
+	[InlineData("status 1 SuperDone")]
+	[InlineData("status abc Completed")]
+	[InlineData("status")]
+	[InlineData("status 1")]
+	public void Parse_StatusWithInvalidArguments_ThrowsInvalidArgumentException(string input)
+	{
+		Action act;
+		act = () => CommandParser.Parse(input);
+		Assert.Throws<InvalidArgumentException>(act);
 	}
 }
