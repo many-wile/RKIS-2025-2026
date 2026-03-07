@@ -1,29 +1,26 @@
 using System;
-
 namespace TodoList.Exceptions
 {
-	public class InvalidCommandException : Exception
+	public class InvalidCommandException : Exception { public InvalidCommandException(string message) : base(message) { } }
+	public class InvalidArgumentException : Exception { public InvalidArgumentException(string message) : base(message) { } }
+	public class TaskNotFoundException : Exception { public TaskNotFoundException(string message) : base(message) { } }
+	public class ProfileNotFoundException : Exception { public ProfileNotFoundException(string message) : base(message) { } }
+	public class AuthenticationException : Exception { public AuthenticationException(string message) : base(message) { } }
+	public class DuplicateLoginException : Exception { public DuplicateLoginException(string message) : base(message) { } }
+	public class DataStorageException : Exception
 	{
-		public InvalidCommandException(string message) : base(message) { }
+		public DataStorageException(string message, Exception innerException = null) : base(message, innerException) { }
 	}
-	public class InvalidArgumentException : Exception
+	public class DataAccessException : DataStorageException
 	{
-		public InvalidArgumentException(string message) : base(message) { }
+		public DataAccessException(string message, Exception innerException = null) : base(message, innerException) { }
 	}
-	public class TaskNotFoundException : Exception
+	public class DataEncryptionException : DataStorageException
 	{
-		public TaskNotFoundException(string message) : base(message) { }
+		public DataEncryptionException(string message, Exception innerException = null) : base(message, innerException) { }
 	}
-	public class ProfileNotFoundException : Exception
+	public class DataCorruptionException : DataStorageException
 	{
-		public ProfileNotFoundException(string message) : base(message) { }
-	}
-	public class AuthenticationException : Exception
-	{
-		public AuthenticationException(string message) : base(message) { }
-	}
-	public class DuplicateLoginException : Exception
-	{
-		public DuplicateLoginException(string message) : base(message) { }
+		public DataCorruptionException(string message, Exception innerException = null) : base(message, innerException) { }
 	}
 }
