@@ -81,7 +81,7 @@ Exception, try-catch-finally, Иерархия исключений, throw, Со
 
 ### Темы:
 
-IP, DNS, URI, URL, TCP, UDP, HTTP, REST API, JSON Сокеты,
+IP, DNS, URI, URL, TCP, UDP, HTTP, REST API, JSON, Сокеты,
 
 ### Дедлайн
 
