@@ -219,7 +219,7 @@ Unit-тесты, xUnit, Создание тестового проекта, Об
 
 ### Темы:
 
-—
+Mock, Stub, Fake, `Moq`, `Setup`, `Returns`, `Verify`
 
 ### Дедлайн
 
