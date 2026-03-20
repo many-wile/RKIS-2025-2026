@@ -93,7 +93,7 @@ IP, DNS, URI, URL, TCP, UDP, HTTP, REST API, JSON, Сокеты,
 
 ### Темы:
 
-—
+SQLite, Провайдеры БД, ADO.NET, Connected Mode, Disconnected Mode, Транзакции, ACID, Repository
 
 ---
 
