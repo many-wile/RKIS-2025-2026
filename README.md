@@ -231,7 +231,7 @@ Mock, Stub, Fake, `Moq`, `Setup`, `Returns`, `Verify`
 
 ### Темы:
 
-—
+Test-Driven Development, Цикл Red-Green-Refactor
 
 ---
 
