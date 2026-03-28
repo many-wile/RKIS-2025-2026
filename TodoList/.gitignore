@@ -1,3 +1,8 @@
 bin
 obj
 .vs
+.appdata
+.dotnet_home
+.userprofile
+.nuget_packages
+.nuget_http_cache
