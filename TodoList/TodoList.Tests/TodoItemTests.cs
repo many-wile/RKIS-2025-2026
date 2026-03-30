@@ -1,35 +1,61 @@
-﻿using System;
-using Xunit;
+﻿using Moq;
 using TodoList;
+
 namespace TodoList.Tests;
+
 public class TodoItemTests
 {
 	[Fact]
-	public void Constructor_ValidText_SetsDefaultStatusAndDate()
+	public void Constructor_ClockProvided_SetsLastUpdateFromClock()
 	{
+		// Arrange
 		string text = "Купить хлеб";
-		TodoItem item = new TodoItem(text);
+		DateTime fixedTime = new DateTime(2025, 1, 1, 12, 0, 0);
+		var clockMock = new Mock<IClock>();
+		clockMock.Setup(c => c.Now).Returns(fixedTime);
+
+		// Act
+		TodoItem item = new TodoItem(text, clockMock.Object);
+
+		// Assert
 		Assert.Equal(text, item.Text);
 		Assert.Equal(TodoStatus.NotStarted, item.Status);
-		Assert.True((DateTime.Now - item.LastUpdate).TotalSeconds < 1);
+		Assert.Equal(fixedTime, item.LastUpdate);
 	}
+
 	[Fact]
-	public void ChangeStatus_ValidStatus_UpdatesStatusAndLastUpdate()
+	public void ChangeStatus_ClockProvided_UpdatesStatusAndLastUpdate()
 	{
-		TodoItem item = new TodoItem("Тест", TodoStatus.NotStarted, DateTime.Now.AddDays(-1));
-		DateTime oldDate = item.LastUpdate;
-		TodoStatus newStatus = TodoStatus.Completed;
-		item.ChangeStatus(newStatus);
-		Assert.Equal(newStatus, item.Status);
-		Assert.NotEqual(oldDate, item.LastUpdate);
+		// Arrange
+		DateTime oldTime = new DateTime(2024, 12, 31, 10, 0, 0);
+		DateTime changedTime = new DateTime(2025, 1, 2, 9, 30, 0);
+		var clockMock = new Mock<IClock>();
+		clockMock.Setup(c => c.Now).Returns(changedTime);
+		TodoItem item = new TodoItem("Тест", TodoStatus.NotStarted, oldTime, clockMock.Object);
+
+		// Act
+		item.ChangeStatus(TodoStatus.Completed);
+
+		// Assert
+		Assert.Equal(TodoStatus.Completed, item.Status);
+		Assert.Equal(changedTime, item.LastUpdate);
 	}
+
 	[Fact]
-	public void UpdateText_ValidText_ChangesTextAndLastUpdate()
+	public void UpdateText_ClockProvided_UpdatesTextAndLastUpdate()
 	{
-		TodoItem item = new TodoItem("Старый текст", TodoStatus.NotStarted, DateTime.Now.AddDays(-1));
-		string newText = "Новый текст";
-		item.UpdateText(newText);
-		Assert.Equal(newText, item.Text);
-		Assert.True(item.LastUpdate.Date == DateTime.Now.Date);
+		// Arrange
+		DateTime oldTime = new DateTime(2024, 12, 31, 8, 0, 0);
+		DateTime changedTime = new DateTime(2025, 1, 3, 14, 15, 0);
+		var clockMock = new Mock<IClock>();
+		clockMock.Setup(c => c.Now).Returns(changedTime);
+		TodoItem item = new TodoItem("Старый текст", TodoStatus.NotStarted, oldTime, clockMock.Object);
+
+		// Act
+		item.UpdateText("Новый текст");
+
+		// Assert
+		Assert.Equal("Новый текст", item.Text);
+		Assert.Equal(changedTime, item.LastUpdate);
 	}
 }
